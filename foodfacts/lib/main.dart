@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
+}
+
+class Food{
+  String name;
+  String imageUrl;
+  Food(this.name,this.imageUrl);
 }
 
 class MyApp extends StatelessWidget {
@@ -13,21 +21,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
@@ -114,21 +107,42 @@ class SearchPage extends StatefulWidget
 
 class _SearchPageState extends State<SearchPage>
 {
-  final List<Map<String, String>> items = List.generate(
-    20, // Number of items
-    (index) => {
-      "image": "https://imgs.search.brave.com/wC6ChSXM6e8yjan1RjpueJiHUXlhlhVKabYUxwS3UkU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zYWZl/aW1hZ2VraXQuY29t/L2Fzc2V0cy9pbWFn/ZXMvcHVycGxlLnN2/Zw", // Placeholder image
-      "name": "Item ${index + 1}"
-    },
-  );
+  List<Food> items = [];
+
+  String query = 'jaffa cake';
+
+  Future<void> fetchFoods() async {
+    final url = Uri.parse('https://world.openfoodfacts.org/cgi/search.pl?search_terms=$query&json=true');
+    final response = await http.get(url);
+    List<Food> newFoods = [];
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final products = data['products'] as List<dynamic>;
+
+      for (var product in products) {
+        final String? name = product['product_name'];
+        final String? imageUrl = product['image_url'];
+
+        if (name != null && imageUrl != null) {
+          newFoods.add( Food(name,imageUrl));
+        }
+      }
+      setState(() {
+        items = newFoods;
+      });
+    } 
+    else {
+      print('Failed to fetch products');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Scrollable Grid')),
+      appBar: AppBar(title: const Text('Foods')),
       body: GridView.builder(
-        padding: EdgeInsets.all(8),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        padding: const EdgeInsets.all(8),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2, // Two items per row
           childAspectRatio: 0.7,
           crossAxisSpacing: 8.0,
@@ -138,26 +152,27 @@ class _SearchPageState extends State<SearchPage>
         itemBuilder: (context, index) {
           return Container(
             color: Colors.grey[700], // Background color
-            padding: EdgeInsets.all(8),
+            padding: const EdgeInsets.all(8),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.network(
-                  items[index]["image"]!,
+                  items[index].imageUrl,
                   height: 80,
                   width: 80,
                   fit: BoxFit.cover,
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Text(
-                  items[index]["name"]!,
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+                  items[index].name,
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
                 ),
               ],
             ),
           );
         },
       ),
+      floatingActionButton: FloatingActionButton(onPressed: fetchFoods,child: const Icon(Icons.refresh),),
     );
   }
 }

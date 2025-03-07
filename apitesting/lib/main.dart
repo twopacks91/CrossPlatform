@@ -66,12 +66,12 @@ class Food{
 
 class _MyHomePageState extends State<MyHomePage> {
   List<Food> _foods=[];
-  String searchFor = 'skittles';
+  String query = 'jaffa cake';
 
   Future<void> fetchFoods() async {
-    final url = Uri.parse('https://world.openfoodfacts.org/cgi/search.pl?search_terms=$searchFor&json=true');
+    final url = Uri.parse('https://world.openfoodfacts.org/cgi/search.pl?search_terms=$query&json=true');
     final response = await http.get(url);
-    List<Food> retval = [];
+    List<Food> newFoods = [];
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final products = data['products'] as List<dynamic>;
@@ -81,11 +81,11 @@ class _MyHomePageState extends State<MyHomePage> {
         final String? imageUrl = product['image_url'];
 
         if (name != null && imageUrl != null) {
-          retval.add( Food(name,imageUrl));
+          newFoods.add( Food(name,imageUrl));
         }
       }
       setState(() {
-      _foods = retval;
+      _foods = newFoods;
       });
     } 
     else {
