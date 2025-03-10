@@ -19,7 +19,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -60,9 +59,6 @@ class _BottomBarNavState extends State<BottomNavBar>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Food Facts'),
-      ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
@@ -139,7 +135,6 @@ class _SearchPageState extends State<SearchPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Foods')),
       body: GridView.builder(
         padding: const EdgeInsets.all(8),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -151,15 +146,15 @@ class _SearchPageState extends State<SearchPage>
         itemCount: items.length,
         itemBuilder: (context, index) {
           return Container(
-            color: Colors.grey[700], // Background color
+            color: const Color.fromARGB(255, 80, 0, 90), // Background color
             padding: const EdgeInsets.all(8),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.network(
                   items[index].imageUrl,
-                  height: 80,
-                  width: 80,
+                  height: 120,
+                  width: 120,
                   fit: BoxFit.cover,
                 ),
                 const SizedBox(height: 10),
@@ -180,6 +175,7 @@ class _SearchPageState extends State<SearchPage>
 class GoalsPage extends StatefulWidget
 {
   const GoalsPage({super.key});
+  
 
   @override
   State<GoalsPage> createState()=> _GoalsPageState();
@@ -187,14 +183,46 @@ class GoalsPage extends StatefulWidget
 
 class _GoalsPageState extends State<GoalsPage>
 {
+  final double carbsProgress = 0.3;
+  final double proteinProgress = 0.2;
+  final double saltProgress = 0.5;
+  final double fatProgress = 0.8;
+
   @override
   Widget build(BuildContext context) 
   {
-    return const Scaffold(
-      body: Text(
-      'Index 1: Goals',
-      ),
+    return Scaffold(
+      body: Column(
+        children: [
+          Padding(padding: EdgeInsets.all(20)),
+          createProgressCircle(300, 300, "Carbs", carbsProgress),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, 
+            children: [
+              createProgressCircle(100, 100, "Protein", proteinProgress),
+              createProgressCircle(100, 100, "Salt", saltProgress),
+              createProgressCircle(100, 100, "Fat", fatProgress),
+            ], 
+          )
+        ],
+      )
     );
+  }
+
+  Widget createProgressCircle(double width,double height,String text, double progress)
+  {
+    return Center(child: 
+        Stack(children: [
+          SizedBox(width: width,height: height, child: 
+            CircularProgressIndicator(semanticsLabel: text,value: progress,)
+          ,),
+          SizedBox(width: width,height: height, child: 
+            Center(child: 
+              Text(text),
+            )
+          ,)
+          ],
+        )
+      ,);
   }
 }
 
