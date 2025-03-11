@@ -1,4 +1,7 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
@@ -9,7 +12,8 @@ void main() {
 class Food{
   String name;
   String imageUrl;
-  Food(this.name,this.imageUrl);
+  String barcode;
+  Food(this.name,this.imageUrl,this.barcode);
 }
 
 class MyApp extends StatelessWidget {
@@ -104,12 +108,16 @@ class SearchPage extends StatefulWidget
 class _SearchPageState extends State<SearchPage>
 {
   List<Food> items = [];
-
+  TextEditingController _searchBarController = TextEditingController();
+  TextEditingController _weightEntryController = TextEditingController();
   String query = 'jaffa cake';
+  bool _showFoodInfo = false;
+  int _foodInfoIndex = 0;
 
   Future<void> fetchFoods() async {
-    final url = Uri.parse('https://world.openfoodfacts.org/cgi/search.pl?search_terms=$query&json=true');
-    final response = await http.get(url);
+    query = _searchBarController.text;
+    final uri = Uri.parse('https://world.openfoodfacts.org/cgi/search.pl?search_terms=$query&json=true');
+    final response = await http.get(uri);
     List<Food> newFoods = [];
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -118,9 +126,9 @@ class _SearchPageState extends State<SearchPage>
       for (var product in products) {
         final String? name = product['product_name'];
         final String? imageUrl = product['image_url'];
-
-        if (name != null && imageUrl != null) {
-          newFoods.add( Food(name,imageUrl));
+        final String? barcode = product['code'];
+        if (name != null && imageUrl != null && barcode != null) {
+          newFoods.add( Food(name,imageUrl,barcode));
         }
       }
       setState(() {
@@ -132,10 +140,20 @@ class _SearchPageState extends State<SearchPage>
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: GridView.builder(
+  void tappedFood(int index)
+  {
+    print("Tapped $index");
+    setState(() {
+      _showFoodInfo = true;
+      _foodInfoIndex = index;
+    });
+
+  }
+
+
+  GridView itemViewer()
+  {
+    return GridView.builder(
         padding: const EdgeInsets.all(8),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2, // Two items per row
@@ -145,30 +163,133 @@ class _SearchPageState extends State<SearchPage>
         ),
         itemCount: items.length,
         itemBuilder: (context, index) {
-          return Container(
-            color: const Color.fromARGB(255, 80, 0, 90), // Background color
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.network(
-                  items[index].imageUrl,
-                  height: 120,
-                  width: 120,
-                  fit: BoxFit.cover,
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  items[index].name,
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
-                ),
-              ],
+          return GestureDetector(
+            onTap: () {
+              tappedFood(index);
+            },
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                color: Color.fromARGB(255, 104, 80, 107),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.network(
+                    items[index].imageUrl,
+                    height: 150,
+                    fit: BoxFit.fill,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    items[index].name,
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ],
+              ),
             ),
           );
+          
         },
-      ),
+      );
+  }
+
+  Scaffold FoodList()
+  {
+    return Scaffold(
+      body: Column(children: [
+        Padding(padding: 
+        EdgeInsets.all(12),
+        child: TextField(
+          decoration: InputDecoration(
+            hintText: "Enter food name",
+            border: OutlineInputBorder(),
+            icon: Icon(Icons.search))
+          ,controller: _searchBarController,),)
+        ,
+        Expanded(child: itemViewer(),),
+      ],),
       floatingActionButton: FloatingActionButton(onPressed: fetchFoods,child: const Icon(Icons.refresh),),
     );
+  }
+
+  void decreaseWeight()
+  {
+    setState(() {
+      int newWeight = int.parse(_weightEntryController.text) - 10;
+      _weightEntryController.text = newWeight.toString();
+    });
+  }
+
+  void increaseWeight()
+  {
+    setState(() {
+      int newWeight = int.parse(_weightEntryController.text) + 10;
+      _weightEntryController.text = newWeight.toString();
+    });
+  }
+
+
+  Scaffold foodInfo()
+  {
+    return Scaffold(
+      body: Padding(
+        padding: EdgeInsets.all(12),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 400,
+              height: 200,
+              child: Image.network(
+                items[_foodInfoIndex].imageUrl,
+                fit: BoxFit.fill,
+              )
+            ),
+            
+            Row(
+              children: [
+                SizedBox(
+                  width: 50,
+                  height: 50,
+                  child:OutlinedButton(
+                    onPressed: decreaseWeight,
+                    child: Text('-')
+                  ),
+                ),
+                SizedBox(
+                  width: 280,
+                  height: 50,
+                  child: TextField(
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    decoration: InputDecoration(
+                      hintText: "Enter weight",
+                      border: OutlineInputBorder(),
+                    ),
+                  controller: _weightEntryController,
+                  ),
+                ),
+                SizedBox(
+                  width: 50,
+                  height: 50,
+                  child:OutlinedButton(
+                    onPressed: increaseWeight,
+                    child: Text('+')
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
+      )
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return (_showFoodInfo? foodInfo():FoodList());
   }
 }
 
