@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
@@ -13,7 +15,13 @@ class Food{
   String name;
   String imageUrl;
   String barcode;
-  Food(this.name,this.imageUrl,this.barcode);
+  double? calories;
+  double? carbs;
+  double? protein;
+  double? salt;
+  double? fat;
+  Long? timeAdded;
+  Food(this.name,this.imageUrl,this.barcode,this.calories,this.carbs,this.protein,this.salt,this.fat);
 }
 
 class MyApp extends StatelessWidget {
@@ -127,8 +135,22 @@ class _SearchPageState extends State<SearchPage>
         final String? name = product['product_name'];
         final String? imageUrl = product['image_url'];
         final String? barcode = product['code'];
+        final nutriments = product['nutriments'] as Map<String, dynamic>;
+        print(nutriments["salt_100g"]);
+        //nutriments["carbohydrates_value"]
+        //nutriments["energy_value"]
+        //nutriments["fat_value"]
+        //nutriments["salt_100g"]
+        
+        //final String? calories = (product['nutriments']['energy_kcal']).toString();
+        //print(calories);
+        //final double? carbs = (product['nutriments']?['carbohydrates'])?.toDouble();
+        //final double? protein = (product['nutriments']?['proteins'])?.toDouble();
+        //final double? salt = (product['nutriments']?['salt'])?.toDouble();
+        //final double? fat = (product['nutriments']?['fat'])?.toDouble();
+
         if (name != null && imageUrl != null && barcode != null) {
-          newFoods.add( Food(name,imageUrl,barcode));
+          //newFoods.add( Food(name,imageUrl,barcode,calories,carbs,protein,salt,fat));
         }
       }
       setState(() {
@@ -156,7 +178,7 @@ class _SearchPageState extends State<SearchPage>
     return GridView.builder(
         padding: const EdgeInsets.all(8),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2, // Two items per row
+          crossAxisCount: 2,
           childAspectRatio: 0.7,
           crossAxisSpacing: 8.0,
           mainAxisSpacing: 8.0,
@@ -216,19 +238,37 @@ class _SearchPageState extends State<SearchPage>
 
   void decreaseWeight()
   {
+    if(_weightEntryController.text=="")
+    {
+      _weightEntryController.text=="0";
+    }
     setState(() {
       int newWeight = int.parse(_weightEntryController.text) - 10;
-      _weightEntryController.text = newWeight.toString();
+      if(newWeight<=0)
+      {
+        _weightEntryController.text = "0";
+      }
+      else
+      {
+        _weightEntryController.text = newWeight.toString();
+      }
+      
     });
   }
 
   void increaseWeight()
   {
+    if(_weightEntryController.text=="")
+    {
+      _weightEntryController.text="0";
+    }
     setState(() {
       int newWeight = int.parse(_weightEntryController.text) + 10;
       _weightEntryController.text = newWeight.toString();
     });
   }
+
+
 
 
   Scaffold foodInfo()
@@ -237,8 +277,9 @@ class _SearchPageState extends State<SearchPage>
       body: Padding(
         padding: EdgeInsets.all(12),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
+            SizedBox(height: 20,),
             SizedBox(
               width: 400,
               height: 200,
@@ -247,8 +288,10 @@ class _SearchPageState extends State<SearchPage>
                 fit: BoxFit.fill,
               )
             ),
-            
+            Expanded(child: SizedBox(),),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              
               children: [
                 SizedBox(
                   width: 50,
@@ -258,9 +301,8 @@ class _SearchPageState extends State<SearchPage>
                     child: Text('-')
                   ),
                 ),
-                SizedBox(
-                  width: 280,
-                  height: 50,
+                SizedBox(width: 8,),
+                Expanded(
                   child: TextField(
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -269,8 +311,10 @@ class _SearchPageState extends State<SearchPage>
                       border: OutlineInputBorder(),
                     ),
                   controller: _weightEntryController,
+                  textAlign: TextAlign.center,
                   ),
                 ),
+                SizedBox(width: 8,),
                 SizedBox(
                   width: 50,
                   height: 50,
@@ -279,6 +323,47 @@ class _SearchPageState extends State<SearchPage>
                     child: Text('+')
                   ),
                 ),
+              ],
+            ),
+            Expanded(child: SizedBox(),),
+            Container(
+              padding: EdgeInsets.all(12),
+              width: 420,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(color: Colors.black)
+              ),
+              child: Column(
+                children: [
+                  Text("Calories: ${items[_foodInfoIndex].calories}kcal"),
+                  Text("Carbs   : ${items[_foodInfoIndex].calories}g"),
+                  Text("Protein : ${items[_foodInfoIndex].calories}g"),
+                  Text("Salt    : ${items[_foodInfoIndex].calories}g"),
+                  Text("Fat     : ${items[_foodInfoIndex].calories}g"),
+                  
+                ],
+              ),
+            ),
+            Expanded(child: SizedBox(),),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                SizedBox(
+                  width: 175,
+                  height: 50,
+                  child:OutlinedButton(
+                    onPressed: (){},
+                    child: Text('Confirm selection')
+                  ),
+                ),
+                SizedBox(
+                  width: 175,
+                  height: 50,
+                  child:OutlinedButton(
+                    onPressed: (){},
+                    child: Text('Add to favourites')
+                  ),
+                )
               ],
             )
           ],
