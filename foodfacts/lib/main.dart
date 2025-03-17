@@ -2,6 +2,7 @@
 
 import 'dart:ffi';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -133,7 +134,7 @@ class SearchPage extends StatefulWidget
 
 class _SearchPageState extends State<SearchPage>
 {
-  List<Food> items = [];
+  List<Food> _foodList = [];
   TextEditingController _searchBarController = TextEditingController();
   TextEditingController _weightEntryController = TextEditingController();
   String query = 'jaffa cake';
@@ -171,12 +172,22 @@ class _SearchPageState extends State<SearchPage>
         }
       }
       setState(() {
-        items = newFoods;
+        _foodList = newFoods;
       });
     } 
     else {
       print('Failed to fetch products');
     }
+  }
+
+  void addFoodToFavourites() async
+  {
+    Food food = _foodList[_foodInfoIndex];
+    await FirebaseFirestore.instance.collection("favfoods").doc(food.barcode).set(food.asMap());
+    setState(() {
+      _showFoodInfo = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food added to favourites list"),duration: Duration(seconds: 2),));
   }
 
   void tappedFood(int index)
@@ -200,7 +211,7 @@ class _SearchPageState extends State<SearchPage>
           crossAxisSpacing: 8.0,
           mainAxisSpacing: 8.0,
         ),
-        itemCount: items.length,
+        itemCount: _foodList.length,
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
@@ -216,13 +227,13 @@ class _SearchPageState extends State<SearchPage>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Image.network(
-                    items[index].imageUrl,
+                    _foodList[index].imageUrl,
                     height: 150,
                     fit: BoxFit.fill,
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    items[index].name,
+                    _foodList[index].name,
                     style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ],
@@ -316,7 +327,7 @@ class _SearchPageState extends State<SearchPage>
               width: 400,
               height: 200,
               child: Image.network(
-                items[_foodInfoIndex].imageUrl,
+                _foodList[_foodInfoIndex].imageUrl,
                 fit: BoxFit.fill,
               )
             ),
@@ -367,11 +378,11 @@ class _SearchPageState extends State<SearchPage>
               ),
               child: Column(
                 children: [
-                  Text("Calories: ${items[_foodInfoIndex].calories}kcal"),
-                  Text("Carbs   : ${items[_foodInfoIndex].carbs}g"),
-                  Text("Protein : ${items[_foodInfoIndex].protein}g"),
-                  Text("Salt    : ${items[_foodInfoIndex].salt}g"),
-                  Text("Fat     : ${items[_foodInfoIndex].fat}g"),
+                  Text("Calories: ${_foodList[_foodInfoIndex].calories}kcal"),
+                  Text("Carbs   : ${_foodList[_foodInfoIndex].carbs}g"),
+                  Text("Protein : ${_foodList[_foodInfoIndex].protein}g"),
+                  Text("Salt    : ${_foodList[_foodInfoIndex].salt}g"),
+                  Text("Fat     : ${_foodList[_foodInfoIndex].fat}g"),
                 ],
               ),
             ),
@@ -391,7 +402,7 @@ class _SearchPageState extends State<SearchPage>
                   width: 175,
                   height: 50,
                   child:OutlinedButton(
-                    onPressed: (){},
+                    onPressed: addFoodToFavourites,
                     child: Text('Add to favourites')
                   ),
                 )
@@ -473,14 +484,277 @@ class FavouritesPage extends StatefulWidget
 
 class _FavouritesPageState extends State<FavouritesPage>
 {
-  @override
-  Widget build(BuildContext context) 
+  bool _hasNoFavourites = false;
+  List<Food> _foodList = [];
+  TextEditingController _weightEntryController = TextEditingController();
+  String query = 'jaffa cake';
+  bool _showFoodInfo = false;
+  int _foodInfoIndex = 0;
+
+  void fetchFoods() async{
+    List<Food> newFoods = [];
+    await FirebaseFirestore.instance.collection("favfoods").get().then((collection){
+      if(collection.docs.isEmpty)
+      {
+        setState(() {
+          _hasNoFavourites = true;
+        });
+      }
+      else
+      {
+        for (dynamic doc in collection.docs){
+          dynamic docData = doc.data();
+          String name = docData['name'];
+          String imageUrl = docData['imageUrl'];
+          String barcode = docData['barcode'];
+          double calories = docData["calories"]?.toDouble();
+          double carbs = docData["carbs"]?.toDouble();
+          double protein = docData["protein"]?.toDouble();
+          double salt = docData["salt"]?.toDouble();
+          double fat = docData["fat"]?.toDouble();
+
+          newFoods.add(Food(name,imageUrl,barcode,calories,carbs,protein,salt,fat));
+        }
+        setState(() {
+          _hasNoFavourites = false;
+          _foodList=newFoods;
+        });
+      }
+    });
+    
+  }
+
+  void removeFoodFromFavourites() async
   {
-    return const Scaffold(
-      body: Text(
-      'Index 2: Favourites',
+    setState(() {
+      _showFoodInfo = false;
+      fetchFoods();
+    });
+    Food food = _foodList[_foodInfoIndex];
+    await FirebaseFirestore.instance.collection("favfoods").doc(food.barcode).delete();
+    
+    
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food removed from favourites list"),duration: Duration(seconds: 2),));
+    
+  }
+
+  void tappedFood(int index)
+  {
+    print("Tapped $index");
+    setState(() {
+      _showFoodInfo = true;
+      _foodInfoIndex = index;
+    });
+
+  }
+
+
+  GridView itemViewer()
+  {
+    return GridView.builder(
+        padding: const EdgeInsets.all(8),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.7,
+          crossAxisSpacing: 8.0,
+          mainAxisSpacing: 8.0,
+        ),
+        itemCount: _foodList.length,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () {
+              tappedFood(index);
+            },
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                color: Color.fromARGB(255, 104, 80, 107),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.network(
+                    _foodList[index].imageUrl,
+                    height: 150,
+                    fit: BoxFit.fill,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    _foodList[index].name,
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ],
+              ),
+            ),
+          );
+          
+        },
+      );
+  }
+
+  Scaffold foodList()
+  {
+    return Scaffold(
+      body: Column(
+        children: [
+          Padding(
+            padding: 
+              EdgeInsets.all(12),
+            ),
+            Expanded(child: itemViewer(),
+          ),
+        ],
       ),
     );
+  }
+
+  void decreaseWeight()
+  {
+    if(_weightEntryController.text=="")
+    {
+      _weightEntryController.text=="0";
+    }
+    setState(() {
+      int newWeight = int.parse(_weightEntryController.text) - 10;
+      if(newWeight<=0)
+      {
+        _weightEntryController.text = "0";
+      }
+      else
+      {
+        _weightEntryController.text = newWeight.toString();
+      }
+      
+    });
+  }
+
+  void increaseWeight()
+  {
+    if(_weightEntryController.text=="")
+    {
+      _weightEntryController.text="0";
+    }
+    setState(() {
+      int newWeight = int.parse(_weightEntryController.text) + 10;
+      _weightEntryController.text = newWeight.toString();
+    });
+  }
+
+  void confirmSelection()
+  {
+    setState(() {
+      _showFoodInfo = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal added"),duration: Duration(seconds: 2),));
+  }
+
+
+
+  Scaffold foodInfo()
+  {
+    return Scaffold(
+      body: Padding(
+        padding: EdgeInsets.all(12),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            SizedBox(height: 20,),
+            SizedBox(
+              width: 400,
+              height: 200,
+              child: Image.network(
+                _foodList[_foodInfoIndex].imageUrl,
+                fit: BoxFit.fill,
+              )
+            ),
+            Expanded(child: SizedBox(),),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              
+              children: [
+                SizedBox(
+                  width: 50,
+                  height: 50,
+                  child:OutlinedButton(
+                    onPressed: decreaseWeight,
+                    child: Text('-')
+                  ),
+                ),
+                SizedBox(width: 8,),
+                Expanded(
+                  child: TextField(
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    decoration: InputDecoration(
+                      hintText: "Enter weight",
+                      border: OutlineInputBorder(),
+                    ),
+                  controller: _weightEntryController,
+                  textAlign: TextAlign.center,
+                  ),
+                ),
+                SizedBox(width: 8,),
+                SizedBox(
+                  width: 50,
+                  height: 50,
+                  child:OutlinedButton(
+                    onPressed: increaseWeight,
+                    child: Text('+')
+                  ),
+                ),
+              ],
+            ),
+            Expanded(child: SizedBox(),),
+            Container(
+              padding: EdgeInsets.all(12),
+              width: 420,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(color: Colors.black)
+              ),
+              child: Column(
+                children: [
+                  Text("Calories: ${_foodList[_foodInfoIndex].calories}kcal"),
+                  Text("Carbs   : ${_foodList[_foodInfoIndex].carbs}g"),
+                  Text("Protein : ${_foodList[_foodInfoIndex].protein}g"),
+                  Text("Salt    : ${_foodList[_foodInfoIndex].salt}g"),
+                  Text("Fat     : ${_foodList[_foodInfoIndex].fat}g"),
+                ],
+              ),
+            ),
+            Expanded(child: SizedBox(),),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                SizedBox(
+                  width: 175,
+                  height: 50,
+                  child:OutlinedButton(
+                    onPressed: confirmSelection,
+                    child: Text('Confirm selection')
+                  ),
+                ),
+                SizedBox(
+                  width: 175,
+                  height: 50,
+                  child:OutlinedButton(
+                    onPressed: removeFoodFromFavourites,
+                    child: Text('Remove from favourites')
+                  ),
+                )
+              ],
+            )
+          ],
+        ),
+      )
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    fetchFoods();
+    return (_showFoodInfo? foodInfo():foodList());
   }
 }
 
