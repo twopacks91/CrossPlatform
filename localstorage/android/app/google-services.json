@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "167644080987",
+    "project_id": "foodfacts-c2be8",
+    "storage_bucket": "foodfacts-c2be8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:167644080987:android:2305985412ca1f1300c87e",
+        "android_client_info": {
+          "package_name": "com.example.foodfacts"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCz2T-iswwtp7NGD3bNAudsFR5Bi5iRR-c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

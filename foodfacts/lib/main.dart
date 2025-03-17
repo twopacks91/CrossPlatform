@@ -2,12 +2,15 @@
 
 import 'dart:ffi';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -22,6 +25,21 @@ class Food{
   double? fat;
   Long? timeAdded;
   Food(this.name,this.imageUrl,this.barcode,this.calories,this.carbs,this.protein,this.salt,this.fat);
+
+  Map<String,dynamic> asMap()
+  {
+    return 
+    {
+      'name': name,
+      'imageUrl': imageUrl,
+      'barcode': barcode,
+      'calories': calories,
+      'carbs': carbs,
+      'protein': protein,
+      'salt': salt,
+      'fat': fat,
+    };
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -136,21 +154,20 @@ class _SearchPageState extends State<SearchPage>
         final String? imageUrl = product['image_url'];
         final String? barcode = product['code'];
         final nutriments = product['nutriments'] as Map<String, dynamic>;
-        print(nutriments["salt_100g"]);
+        
         //nutriments["carbohydrates_value"]
         //nutriments["energy_value"]
         //nutriments["fat_value"]
         //nutriments["salt_100g"]
         
-        //final String? calories = (product['nutriments']['energy_kcal']).toString();
-        //print(calories);
-        //final double? carbs = (product['nutriments']?['carbohydrates'])?.toDouble();
-        //final double? protein = (product['nutriments']?['proteins'])?.toDouble();
-        //final double? salt = (product['nutriments']?['salt'])?.toDouble();
-        //final double? fat = (product['nutriments']?['fat'])?.toDouble();
+        final double? calories = (nutriments['energy_value'])?.toDouble();
+        final double? carbs = (nutriments['carbohydrates_value'])?.toDouble();
+        final double? protein = (nutriments['proteins'])?.toDouble();
+        final double? salt = (nutriments['salt_100g'])?.toDouble();
+        final double? fat = (nutriments['fat_value'])?.toDouble();
 
         if (name != null && imageUrl != null && barcode != null) {
-          //newFoods.add( Food(name,imageUrl,barcode,calories,carbs,protein,salt,fat));
+          newFoods.add( Food(name,imageUrl,barcode,calories,carbs,protein,salt,fat));
         }
       }
       setState(() {
@@ -217,22 +234,30 @@ class _SearchPageState extends State<SearchPage>
       );
   }
 
-  Scaffold FoodList()
+  Scaffold foodList()
   {
     return Scaffold(
-      body: Column(children: [
-        Padding(padding: 
-        EdgeInsets.all(12),
-        child: TextField(
-          decoration: InputDecoration(
-            hintText: "Enter food name",
-            border: OutlineInputBorder(),
-            icon: Icon(Icons.search))
-          ,controller: _searchBarController,),)
-        ,
-        Expanded(child: itemViewer(),),
-      ],),
-      floatingActionButton: FloatingActionButton(onPressed: fetchFoods,child: const Icon(Icons.refresh),),
+      body: Column(
+        children: [
+          Padding(
+            padding: 
+            EdgeInsets.all(12),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: "Enter food name",
+                  border: OutlineInputBorder(),
+                  icon: IconButton(
+                    onPressed: fetchFoods, 
+                    icon: Icon(Icons.search)
+                  )
+                ),
+                controller: _searchBarController
+              ),
+            ),
+            Expanded(child: itemViewer(),
+          ),
+        ],
+      ),
     );
   }
 
@@ -268,6 +293,13 @@ class _SearchPageState extends State<SearchPage>
     });
   }
 
+  void confirmSelection()
+  {
+    setState(() {
+      _showFoodInfo = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal added"),duration: Duration(seconds: 2),));
+  }
 
 
 
@@ -336,11 +368,10 @@ class _SearchPageState extends State<SearchPage>
               child: Column(
                 children: [
                   Text("Calories: ${items[_foodInfoIndex].calories}kcal"),
-                  Text("Carbs   : ${items[_foodInfoIndex].calories}g"),
-                  Text("Protein : ${items[_foodInfoIndex].calories}g"),
-                  Text("Salt    : ${items[_foodInfoIndex].calories}g"),
-                  Text("Fat     : ${items[_foodInfoIndex].calories}g"),
-                  
+                  Text("Carbs   : ${items[_foodInfoIndex].carbs}g"),
+                  Text("Protein : ${items[_foodInfoIndex].protein}g"),
+                  Text("Salt    : ${items[_foodInfoIndex].salt}g"),
+                  Text("Fat     : ${items[_foodInfoIndex].fat}g"),
                 ],
               ),
             ),
@@ -352,7 +383,7 @@ class _SearchPageState extends State<SearchPage>
                   width: 175,
                   height: 50,
                   child:OutlinedButton(
-                    onPressed: (){},
+                    onPressed: confirmSelection,
                     child: Text('Confirm selection')
                   ),
                 ),
@@ -374,7 +405,7 @@ class _SearchPageState extends State<SearchPage>
 
   @override
   Widget build(BuildContext context) {
-    return (_showFoodInfo? foodInfo():FoodList());
+    return (_showFoodInfo? foodInfo():foodList());
   }
 }
 
