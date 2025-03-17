@@ -24,22 +24,38 @@ class Food{
   double? protein;
   double? salt;
   double? fat;
-  Long? timeAdded;
+  int? timeAdded;
+  double? weight;
   Food(this.name,this.imageUrl,this.barcode,this.calories,this.carbs,this.protein,this.salt,this.fat);
 
-  Map<String,dynamic> asMap()
-  {
-    return 
-    {
-      'name': name,
-      'imageUrl': imageUrl,
-      'barcode': barcode,
-      'calories': calories,
-      'carbs': carbs,
-      'protein': protein,
-      'salt': salt,
-      'fat': fat,
-    };
+  Map<String,dynamic> asMap() {
+    if(timeAdded == null || weight == null) {
+      return {
+        'name': name,
+        'imageUrl': imageUrl,
+        'barcode': barcode,
+        'calories': calories,
+        'carbs': carbs,
+        'protein': protein,
+        'salt': salt,
+        'fat': fat,
+      };
+    }
+    else{
+      return {
+        'name': name,
+        'imageUrl': imageUrl,
+        'barcode': barcode,
+        'calories': calories,
+        'carbs': carbs,
+        'protein': protein,
+        'salt': salt,
+        'fat': fat,
+        'timeAdded' : timeAdded,
+        'weight' : weight,
+      };
+    }
+    
   }
 }
 
@@ -167,7 +183,15 @@ class _SearchPageState extends State<SearchPage>
         final double? salt = (nutriments['salt_100g'])?.toDouble();
         final double? fat = (nutriments['fat_value'])?.toDouble();
 
-        if (name != null && imageUrl != null && barcode != null) {
+        if (name != null && 
+        imageUrl != null && 
+        barcode != null &&
+        calories != null &&
+        carbs != null &&
+        protein != null &&
+        salt != null &&
+        fat != null
+        ) {
           newFoods.add( Food(name,imageUrl,barcode,calories,carbs,protein,salt,fat));
         }
       }
@@ -188,6 +212,16 @@ class _SearchPageState extends State<SearchPage>
       _showFoodInfo = false;
     });
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food added to favourites list"),duration: Duration(seconds: 2),));
+  }
+
+  void removeFoodFromFavourites() async
+  {
+    setState(() {
+      _showFoodInfo = false;
+    });
+    Food food = _foodList[_foodInfoIndex];
+    await FirebaseFirestore.instance.collection("favfoods").doc(food.barcode).delete();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food removed from favourites list"),duration: Duration(seconds: 2),));
   }
 
   void tappedFood(int index)
@@ -306,13 +340,56 @@ class _SearchPageState extends State<SearchPage>
 
   void confirmSelection()
   {
+    addMealToDB();
+    
+    
+  }
+
+  void addMealToDB() async
+  {
+    int timeStamp = DateTime.now().millisecondsSinceEpoch;
+    Food food = _foodList[_foodInfoIndex];
+    food.timeAdded = timeStamp;
+    String docName = food.barcode + timeStamp.toString();
+    double weight = int.parse(_weightEntryController.text).toDouble();
+    if(weight>0)
+    {
+      food.weight = weight;
+      await FirebaseFirestore.instance.collection("meals").doc(docName).set(food.asMap());
+      setState(() {
+      _showFoodInfo = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal added"),duration: Duration(seconds: 2),));
+    }
+    else
+    {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Enter a meal weight before adding"),duration: Duration(seconds: 2),));
+    }
+  }
+
+  void backToItemsPage()
+  {
     setState(() {
       _showFoodInfo = false;
     });
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal added"),duration: Duration(seconds: 2),));
   }
 
-
+  Future<bool> isSelectedItemFavourited() async
+  {
+    List<String> favedBarcodes = [];
+    await FirebaseFirestore.instance.collection("favfoods").get().then((collection){
+      for (dynamic doc in collection.docs){
+        favedBarcodes.add(doc.id);
+      }
+    });
+    if(favedBarcodes.contains(_foodList[_foodInfoIndex].barcode)) { 
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
 
   Scaffold foodInfo()
   {
@@ -391,7 +468,15 @@ class _SearchPageState extends State<SearchPage>
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 SizedBox(
-                  width: 175,
+                  width: 120,
+                  height: 50,
+                  child:OutlinedButton(
+                    onPressed: backToItemsPage,
+                    child: Text('Back')
+                  ),
+                ),
+                SizedBox(
+                  width: 120,
                   height: 50,
                   child:OutlinedButton(
                     onPressed: confirmSelection,
@@ -399,13 +484,34 @@ class _SearchPageState extends State<SearchPage>
                   ),
                 ),
                 SizedBox(
-                  width: 175,
+                  width: 120,
                   height: 50,
-                  child:OutlinedButton(
-                    onPressed: addFoodToFavourites,
-                    child: Text('Add to favourites')
-                  ),
-                )
+                  child: FutureBuilder(future: isSelectedItemFavourited(), builder: (context,snapshot){
+                    if(snapshot.connectionState == ConnectionState.done)
+                    {
+                      bool isFavourited = snapshot.data ?? false;
+                      return (isFavourited?
+                        OutlinedButton(
+                          onPressed: removeFoodFromFavourites,
+                          child: Text('Remove from favourites')
+                        )
+                      :
+                        OutlinedButton(
+                          onPressed: addFoodToFavourites,
+                          child: Text('Add food to favourites')
+                        )
+                      );
+                    }
+                    else
+                    {
+                      return OutlinedButton(
+                          onPressed: (){ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Still talking with database, try again later"),duration: Duration(seconds: 2),));},
+                          child: Text('Add food to favourites')
+                        );
+                    }
+                  })
+                  )
+                
               ],
             )
           ],
@@ -536,10 +642,7 @@ class _FavouritesPageState extends State<FavouritesPage>
     });
     Food food = _foodList[_foodInfoIndex];
     await FirebaseFirestore.instance.collection("favfoods").doc(food.barcode).delete();
-    
-    
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food removed from favourites list"),duration: Duration(seconds: 2),));
-    
   }
 
   void tappedFood(int index)
@@ -632,7 +735,7 @@ class _FavouritesPageState extends State<FavouritesPage>
   {
     if(_weightEntryController.text=="")
     {
-      _weightEntryController.text=="0";
+      _weightEntryController.text="0";
     }
     setState(() {
       int newWeight = int.parse(_weightEntryController.text) - 10;
@@ -662,13 +765,32 @@ class _FavouritesPageState extends State<FavouritesPage>
 
   void confirmSelection()
   {
-    setState(() {
-      _showFoodInfo = false;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal added"),duration: Duration(seconds: 2),));
+    addMealToDB();
+    
+    
   }
 
-
+  void addMealToDB() async
+  {
+    int timeStamp = DateTime.now().millisecondsSinceEpoch;
+    Food food = _foodList[_foodInfoIndex];
+    food.timeAdded = timeStamp;
+    String docName = food.barcode + timeStamp.toString();
+    double weight = int.parse(_weightEntryController.text).toDouble();
+    if(weight>0)
+    {
+      food.weight = weight;
+      await FirebaseFirestore.instance.collection("meals").doc(docName).set(food.asMap());
+      setState(() {
+      _showFoodInfo = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal added"),duration: Duration(seconds: 2),));
+    }
+    else
+    {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Enter a meal weight before adding"),duration: Duration(seconds: 2),));
+    }
+  }
 
   Scaffold foodInfo()
   {
