@@ -515,10 +515,14 @@ class _FavouritesPageState extends State<FavouritesPage>
 
           newFoods.add(Food(name,imageUrl,barcode,calories,carbs,protein,salt,fat));
         }
-        setState(() {
+        if(mounted)
+        {
+          setState(() {
           _hasNoFavourites = false;
           _foodList=newFoods;
         });
+        }
+        
       }
     });
     
@@ -596,16 +600,31 @@ class _FavouritesPageState extends State<FavouritesPage>
   Scaffold foodList()
   {
     return Scaffold(
-      body: Column(
-        children: [
-          Padding(
-            padding: 
-              EdgeInsets.all(12),
+      body: (_hasNoFavourites? 
+        // If user has no favourited foods, tell them
+        Center(
+          child:Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children: const [
+              Text("You have no favourited foods",textAlign: TextAlign.center),
+              Text("Try adding some from the search page",textAlign: TextAlign.center),
+            ],
+          )
+        )
+        :
+        // Else display their favourites
+        Column(
+          children: [
+            Padding(
+              padding: 
+                EdgeInsets.all(12),
+              ),
+              Expanded(child: itemViewer(),
             ),
-            Expanded(child: itemViewer(),
-          ),
-        ],
-      ),
+          ],
+        )
+      )
     );
   }
 
