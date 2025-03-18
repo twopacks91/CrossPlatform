@@ -1,89 +1,70 @@
 // ignore_for_file: prefer_const_constructors
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:foodfacts/Food.dart';
 
-class SearchPage extends StatefulWidget
+
+class FavouritesPage extends StatefulWidget
 {
-  const SearchPage({super.key});
+  const FavouritesPage({super.key});
 
   @override
-  State<SearchPage> createState()=> _SearchPageState();
+  State<FavouritesPage> createState()=> _FavouritesPageState();
 }
 
-class _SearchPageState extends State<SearchPage>
+class _FavouritesPageState extends State<FavouritesPage>
 {
+  bool _hasNoFavourites = false;
   List<Food> _foodList = [];
-  TextEditingController _searchBarController = TextEditingController();
   TextEditingController _weightEntryController = TextEditingController();
   String query = 'jaffa cake';
   bool _showFoodInfo = false;
   int _foodInfoIndex = 0;
 
-  Future<void> fetchFoods() async {
-    query = _searchBarController.text;
-    final uri = Uri.parse('https://world.openfoodfacts.org/cgi/search.pl?search_terms=$query&json=true');
-    final response = await http.get(uri);
+  void fetchFoods() async{
     List<Food> newFoods = [];
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final products = data['products'] as List<dynamic>;
-
-      for (var product in products) {
-        final String? name = product['product_name'];
-        final String? imageUrl = product['image_url'];
-        final String? barcode = product['code'];
-        final nutriments = product['nutriments'] as Map<String, dynamic>;
-        
-        //nutriments["carbohydrates_value"]
-        //nutriments["energy_value"]
-        //nutriments["fat_value"]
-        //nutriments["salt_100g"]
-        
-        final double? calories = (nutriments['energy_value'])?.toDouble();
-        final double? carbs = (nutriments['carbohydrates_value'])?.toDouble();
-        final double? protein = (nutriments['proteins'])?.toDouble();
-        final double? salt = (nutriments['salt_100g'])?.toDouble();
-        final double? fat = (nutriments['fat_value'])?.toDouble();
-
-        if (name != null && 
-        imageUrl != null && 
-        barcode != null &&
-        calories != null &&
-        carbs != null &&
-        protein != null &&
-        salt != null &&
-        fat != null
-        ) {
-          newFoods.add( Food(name,imageUrl,barcode,calories,carbs,protein,salt,fat));
-        }
+    await FirebaseFirestore.instance.collection("favfoods").get().then((collection){
+      if(collection.docs.isEmpty)
+      {
+        setState(() {
+          _hasNoFavourites = true;
+        });
       }
-      setState(() {
-        _foodList = newFoods;
-      });
-    } 
-    else {
-      print('Failed to fetch products');
-    }
-  }
+      else
+      {
+        for (dynamic doc in collection.docs){
+          dynamic docData = doc.data();
+          String name = docData['name'];
+          String imageUrl = docData['imageUrl'];
+          String barcode = docData['barcode'];
+          double calories = docData["calories"]?.toDouble();
+          double carbs = docData["carbs"]?.toDouble();
+          double protein = docData["protein"]?.toDouble();
+          double salt = docData["salt"]?.toDouble();
+          double fat = docData["fat"]?.toDouble();
 
-  void addFoodToFavourites() async
-  {
-    Food food = _foodList[_foodInfoIndex];
-    await FirebaseFirestore.instance.collection("favfoods").doc(food.barcode).set(food.asMap());
-    setState(() {
-      _showFoodInfo = false;
+          newFoods.add(Food(name,imageUrl,barcode,calories,carbs,protein,salt,fat));
+        }
+        if(mounted)
+        {
+          setState(() {
+          _hasNoFavourites = false;
+          _foodList=newFoods;
+        });
+        }
+        
+      }
     });
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food added to favourites list"),duration: Duration(seconds: 2),));
+    
   }
 
   void removeFoodFromFavourites() async
   {
     setState(() {
       _showFoodInfo = false;
+      fetchFoods();
     });
     Food food = _foodList[_foodInfoIndex];
     await FirebaseFirestore.instance.collection("favfoods").doc(food.barcode).delete();
@@ -148,27 +129,31 @@ class _SearchPageState extends State<SearchPage>
   Scaffold foodList()
   {
     return Scaffold(
-      body: Column(
-        children: [
-          Padding(
-            padding: 
-            EdgeInsets.all(12),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: "Enter food name",
-                  border: OutlineInputBorder(),
-                  icon: IconButton(
-                    onPressed: fetchFoods, 
-                    icon: Icon(Icons.search)
-                  )
-                ),
-                controller: _searchBarController
+      body: (_hasNoFavourites? 
+        // If user has no favourited foods, tell them
+        Center(
+          child:Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children: const [
+              Text("You have no favourited foods",textAlign: TextAlign.center),
+              Text("Try adding some from the search page",textAlign: TextAlign.center),
+            ],
+          )
+        )
+        :
+        // Else display their favourites
+        Column(
+          children: [
+            Padding(
+              padding: 
+                EdgeInsets.all(12),
               ),
+              Expanded(child: itemViewer(),
             ),
-            Expanded(child: itemViewer(),
-          ),
-        ],
-      ),
+          ],
+        )
+      )
     );
   }
 
@@ -176,7 +161,7 @@ class _SearchPageState extends State<SearchPage>
   {
     if(_weightEntryController.text=="")
     {
-      _weightEntryController.text=="0";
+      _weightEntryController.text="0";
     }
     setState(() {
       int newWeight = int.parse(_weightEntryController.text) - 10;
@@ -238,23 +223,6 @@ class _SearchPageState extends State<SearchPage>
     setState(() {
       _showFoodInfo = false;
     });
-  }
-
-  Future<bool> isSelectedItemFavourited() async
-  {
-    List<String> favedBarcodes = [];
-    await FirebaseFirestore.instance.collection("favfoods").get().then((collection){
-      for (dynamic doc in collection.docs){
-        favedBarcodes.add(doc.id);
-      }
-    });
-    if(favedBarcodes.contains(_foodList[_foodInfoIndex].barcode)) { 
-      return true;
-    }
-    else
-    {
-      return false;
-    }
   }
 
   Scaffold foodInfo()
@@ -352,32 +320,11 @@ class _SearchPageState extends State<SearchPage>
                 SizedBox(
                   width: 120,
                   height: 50,
-                  child: FutureBuilder(future: isSelectedItemFavourited(), builder: (context,snapshot){
-                    if(snapshot.connectionState == ConnectionState.done)
-                    {
-                      bool isFavourited = snapshot.data ?? false;
-                      return (isFavourited?
-                        OutlinedButton(
-                          onPressed: removeFoodFromFavourites,
-                          child: Text('Remove from favourites')
-                        )
-                      :
-                        OutlinedButton(
-                          onPressed: addFoodToFavourites,
-                          child: Text('Add food to favourites')
-                        )
-                      );
-                    }
-                    else
-                    {
-                      return OutlinedButton(
-                          onPressed: (){ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Still talking with database, try again later"),duration: Duration(seconds: 2),));},
-                          child: Text('Add food to favourites')
-                        );
-                    }
-                  })
-                  )
-                
+                  child:OutlinedButton(
+                    onPressed: removeFoodFromFavourites,
+                    child: Text('Remove from favourites')
+                  ),
+                )
               ],
             )
           ],
@@ -387,7 +334,15 @@ class _SearchPageState extends State<SearchPage>
   }
 
   @override
+  void initState()
+  {
+    super.initState();
+    fetchFoods();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    
     return (_showFoodInfo? foodInfo():foodList());
   }
 }
