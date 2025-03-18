@@ -542,6 +542,48 @@ class _GoalsPageState extends State<GoalsPage>
   final double saltProgress = 0.5;
   final double fatProgress = 0.8;
 
+  List<Food> _meals = [];
+
+  void fetchMeals() async {
+    List<Food> newFoods = [];
+    await FirebaseFirestore.instance.collection("meals").get().then((collection){
+      for (dynamic doc in collection.docs){
+        dynamic docData = doc.data();
+        String name = docData['name'];
+        String imageUrl = docData['imageUrl'];
+        String barcode = docData['barcode'];
+        double calories = docData["calories"]?.toDouble();
+        double carbs = docData["carbs"]?.toDouble();
+        double protein = docData["protein"]?.toDouble();
+        double salt = docData["salt"]?.toDouble();
+        double fat = docData["fat"]?.toDouble();
+        int timeAdded = docData["timeAdded"];
+        double weight = docData["weight"].toDouble();
+        Food newFood = Food(name, imageUrl, barcode, calories, carbs, protein, salt, fat);
+        newFood.timeAdded = timeAdded;
+        newFood.weight = weight;
+        newFoods.add(newFood);
+      }
+    });
+    setState(() {
+      _meals = newFoods;
+    });
+  }
+
+  void removeMeal(Food meal) async{
+    String docName = meal.barcode + meal.timeAdded.toString();
+    await FirebaseFirestore.instance.collection("meals").doc(docName).delete();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal removed"),duration: Duration(seconds: 2),));
+    fetchMeals();
+  }
+
+  @override
+  void initState()
+  {
+    super.initState();
+    fetchMeals();
+  }
+
   @override
   Widget build(BuildContext context) 
   {
@@ -556,6 +598,41 @@ class _GoalsPageState extends State<GoalsPage>
               createProgressCircle(100, 100, "Salt", saltProgress),
               createProgressCircle(100, 100, "Fat", fatProgress),
             ], 
+          ),
+          SizedBox(height: 10,),
+          Container(
+            padding: EdgeInsets.all(12),
+            width: 420,
+            height: 350,
+            
+            child: ListView.builder(
+              itemCount: _meals.length,
+              itemBuilder: (context,index){
+                return Card(
+                  child: ExpansionTile(
+                    title: Text(_meals[index].name),
+                    trailing: Icon(Icons.arrow_drop_down),
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("More info at some point"),
+                            SizedBox(height: 10,),
+                            Center(
+                              child: OutlinedButton(onPressed: ()=>{removeMeal(_meals[index])}, child: Text("Remove meal")),
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                    
+                );
+              }
+            
+            ),
           )
         ],
       )
@@ -792,6 +869,13 @@ class _FavouritesPageState extends State<FavouritesPage>
     }
   }
 
+  void backToItemsPage()
+  {
+    setState(() {
+      _showFoodInfo = false;
+    });
+  }
+
   Scaffold foodInfo()
   {
     return Scaffold(
@@ -869,7 +953,15 @@ class _FavouritesPageState extends State<FavouritesPage>
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 SizedBox(
-                  width: 175,
+                  width: 120,
+                  height: 50,
+                  child:OutlinedButton(
+                    onPressed: backToItemsPage,
+                    child: Text('Back')
+                  ),
+                ),
+                SizedBox(
+                  width: 120,
                   height: 50,
                   child:OutlinedButton(
                     onPressed: confirmSelection,
@@ -877,7 +969,7 @@ class _FavouritesPageState extends State<FavouritesPage>
                   ),
                 ),
                 SizedBox(
-                  width: 175,
+                  width: 120,
                   height: 50,
                   child:OutlinedButton(
                     onPressed: removeFoodFromFavourites,
@@ -893,8 +985,15 @@ class _FavouritesPageState extends State<FavouritesPage>
   }
 
   @override
-  Widget build(BuildContext context) {
+  void initState()
+  {
+    super.initState();
     fetchFoods();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    
     return (_showFoodInfo? foodInfo():foodList());
   }
 }
