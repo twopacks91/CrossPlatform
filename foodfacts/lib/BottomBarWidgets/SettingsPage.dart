@@ -15,10 +15,20 @@ class _SettingsPageState extends State<SettingsPage>
   @override
   Widget build(BuildContext context) 
   {
-    return const Scaffold(
-      body: Text(
-      'Index 3: Settings',
-      ),
-    );
+    return Scaffold(
+      backgroundColor: Theme.of(context).canvasColor,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ExpansionTile(
+            title: Text("eoptio"),
+            children: [
+              Text("heheh")
+            ],
+            
+          )
+        ],
+      )
+      );
   }
 }

@@ -73,7 +73,6 @@ class _FavouritesPageState extends State<FavouritesPage>
 
   void tappedFood(int index)
   {
-    print("Tapped $index");
     setState(() {
       _showFoodInfo = true;
       _foodInfoIndex = index;
@@ -100,9 +99,10 @@ class _FavouritesPageState extends State<FavouritesPage>
             },
             child: Container(
               padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-                color: Color.fromARGB(255, 104, 80, 107),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+                color: Theme.of(context).primaryColor,
+                border: Border.all(color: Theme.of(context).highlightColor)
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -115,7 +115,7 @@ class _FavouritesPageState extends State<FavouritesPage>
                   const SizedBox(height: 10),
                   Text(
                     _foodList[index].name,
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                    style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0), fontSize: 16),
                   ),
                 ],
               ),
@@ -129,6 +129,7 @@ class _FavouritesPageState extends State<FavouritesPage>
   Scaffold foodList()
   {
     return Scaffold(
+      backgroundColor: Theme.of(context).canvasColor,
       body: (_hasNoFavourites? 
         // If user has no favourited foods, tell them
         Center(
@@ -228,6 +229,7 @@ class _FavouritesPageState extends State<FavouritesPage>
   Scaffold foodInfo()
   {
     return Scaffold(
+      backgroundColor: Theme.of(context).canvasColor,
       body: Padding(
         padding: EdgeInsets.all(12),
         child: Column(
@@ -285,7 +287,7 @@ class _FavouritesPageState extends State<FavouritesPage>
               width: 420,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: Colors.black)
+                border: Border.all(color: Theme.of(context).highlightColor,)
               ),
               child: Column(
                 children: [

@@ -92,7 +92,6 @@ class _SearchPageState extends State<SearchPage>
 
   void tappedFood(int index)
   {
-    print("Tapped $index");
     setState(() {
       _showFoodInfo = true;
       _foodInfoIndex = index;
@@ -119,9 +118,10 @@ class _SearchPageState extends State<SearchPage>
             },
             child: Container(
               padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-                color: Color.fromARGB(255, 104, 80, 107),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+                color: Color.fromARGB(255, 235, 221, 255),
+                border: Border.all(color: Colors.deepPurple)
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -134,7 +134,7 @@ class _SearchPageState extends State<SearchPage>
                   const SizedBox(height: 10),
                   Text(
                     _foodList[index].name,
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                    style: const TextStyle(color: Colors.black, fontSize: 16),
                   ),
                 ],
               ),
@@ -148,6 +148,7 @@ class _SearchPageState extends State<SearchPage>
   Scaffold foodList()
   {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(96, 81, 58, 183),
       body: Column(
         children: [
           Padding(
@@ -155,9 +156,11 @@ class _SearchPageState extends State<SearchPage>
             EdgeInsets.all(12),
               child: TextField(
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Color.fromARGB(255, 235, 221, 255),
                   hintText: "Enter food name",
                   border: OutlineInputBorder(),
-                  icon: IconButton(
+                  suffixIcon: IconButton(
                     onPressed: fetchFoods, 
                     icon: Icon(Icons.search)
                   )
@@ -260,6 +263,7 @@ class _SearchPageState extends State<SearchPage>
   Scaffold foodInfo()
   {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(96, 81, 58, 183),
       body: Padding(
         padding: EdgeInsets.all(12),
         child: Column(
@@ -317,7 +321,7 @@ class _SearchPageState extends State<SearchPage>
               width: 420,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: Colors.black)
+                border: Border.all(color: Colors.deepPurple)
               ),
               child: Column(
                 children: [

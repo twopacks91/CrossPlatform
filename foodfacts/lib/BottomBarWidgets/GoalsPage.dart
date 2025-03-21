@@ -107,29 +107,39 @@ class _GoalsPageState extends State<GoalsPage>
   Widget build(BuildContext context) 
   {
     return Scaffold(
+      backgroundColor: Theme.of(context).canvasColor,
       body: Column(
+        
         children: [
           Padding(padding: EdgeInsets.all(20)),
-          createProgressCircle(300, 300, "Carbs", carbsProgress),
-          SizedBox(height: 10),
+          createProgressCircle(300, "Carbs", carbsProgress),
+          SizedBox(height: 20),
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, 
             children: [
-              createProgressCircle(100, 100, "Protein", proteinProgress),
-              createProgressCircle(100, 100, "Salt", saltProgress),
-              createProgressCircle(100, 100, "Fat", fatProgress),
+              createProgressCircle(100, "Protein", proteinProgress),
+              createProgressCircle(100, "Salt", saltProgress),
+              createProgressCircle(100, "Fat", fatProgress),
             ], 
           ),
-          SizedBox(height: 10,),
+          SizedBox(height: 20,),
+          Padding(padding: EdgeInsets.all(8),child: 
           Container(
-            padding: EdgeInsets.all(12),
             width: 420,
-            height: 350,
-            
-            child: ListView.builder(
+            height: 330,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(8)),
+              border: Border.all(color: Theme.of(context).highlightColor),
+              color: Theme.of(context).primaryColor
+            ),
+            child: ( _meals.length==0 ? 
+            // If there are no meals tell the user
+            Text("No meals listed for today",textAlign: TextAlign.center,) 
+            : 
+            // Else display meal list
+            ListView.builder(
               itemCount: _meals.length,
               itemBuilder: (context,index){
-                return Card(
-                  child: ExpansionTile(
+                return ExpansionTile(
                     title: Text("${_meals[index].name} : ${_meals[index].weight.toString()}g"),
                     trailing: Icon(Icons.arrow_drop_down),
                     children: [
@@ -152,32 +162,66 @@ class _GoalsPageState extends State<GoalsPage>
                         ),
                       )
                     ],
-                  ),
+                  );
                     
-                );
+                
               }
             
-            ),
-          )
+            ))
+          ))
         ],
       )
     );
   }
 
-  Widget createProgressCircle(double width,double height,String text, double progress)
+  Widget createProgressCircle(double diameter,String text, double progress)
   {
-    return Center(child: 
-        Stack(children: [
-          SizedBox(width: width,height: height, child: 
-            CircularProgressIndicator(semanticsLabel: text,value: progress,)
-          ,),
-          SizedBox(width: width,height: height, child: 
-            Center(child: 
-              Text(text),
+    double overrun = progress-1;
+    return Center(
+      child: 
+        Stack(
+          children: [
+            CircleAvatar(radius: (diameter/2),),
+            SizedBox(
+              width: diameter
+              ,height: diameter, 
+              child: CircularProgressIndicator(
+                semanticsLabel: text,
+                value: 1,
+                color: Theme.of(context).unselectedWidgetColor,
+                strokeWidth: 6,
+              )
+            ),
+            SizedBox(
+              width: diameter
+              ,height: diameter, 
+              child: CircularProgressIndicator(
+                semanticsLabel: text,
+                value: progress,
+                color: const Color.fromARGB(255, 179, 255, 92),
+                strokeWidth: 6,
+              )
+            ),
+            SizedBox(
+              width: diameter
+              ,height: diameter, 
+              child: CircularProgressIndicator(
+                semanticsLabel: text,
+                value: overrun,
+                color: const Color.fromARGB(255, 255, 0, 0),
+                strokeWidth: 3,
+              )
+            ),
+            SizedBox(
+              width: diameter,
+              height: diameter, 
+              child: Center(
+                child: Text(text,textScaler: TextScaler.linear(diameter/80)),
+                
+              )
             )
-          ,)
           ],
         )
-      ,);
+      );
   }
 }
