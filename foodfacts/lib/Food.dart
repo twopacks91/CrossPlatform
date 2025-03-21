@@ -12,6 +12,7 @@ class Food{
   Food(this.name,this.imageUrl,this.barcode,this.calories,this.carbs,this.protein,this.salt,this.fat);
 
   Map<String,dynamic> asMap() {
+    // If this is being used to display search results / add fave food
     if(timeAdded == null || weight == null) {
       return {
         'name': name,
@@ -24,6 +25,7 @@ class Food{
         'fat': fat,
       };
     }
+    // Else it is being used as a meal and should have its nutriments updated by weight
     else{
       return {
         'name': name,

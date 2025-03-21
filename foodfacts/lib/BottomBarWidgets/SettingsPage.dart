@@ -1,4 +1,5 @@
 // ignore_for_file: prefer_const_constructors
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 //import 'package:shared_preferences/shared_preferences.dart';
@@ -22,59 +23,66 @@ class _SettingsPageState extends State<SettingsPage>
   final _saltGoalController = TextEditingController();
   final _fatGoalController = TextEditingController();
 
-  //Future<void> loadGoals() async {
-  //  dynamic settings = await SharedPreferences.getInstance();
-  //  _carbsGoalController.text = settings.getInt('carbsGoal') ?? 0;
-  //  _proteinGoalController.text = settings.getInt('proteinGoal') ?? 0;
-  //  _saltGoalController.text = settings.getInt('saltGoal') ?? 0;
-  //  _fatGoalController.text = settings.getInt('fatGoal') ?? 0;
-  //}
+  Future<void> getGoals() async {
+    dynamic doc = await FirebaseFirestore.instance.collection("settings").doc("goals").get();
+    Map<String,dynamic> docData = doc.data() as Map<String,dynamic>;
+    int carbs = docData["carbsgoal"];
+    int protein = docData["proteingoal"];
+    int salt = docData["saltgoal"];
+    int fat = docData["fatgoal"];
+    setState(() {
+      _carbsGoalController.text = carbs.toString();
+      _proteinGoalController.text = protein.toString();
+      _saltGoalController.text = salt.toString();
+      _fatGoalController.text = fat.toString();
+    });
+  }
 
-  //Future<void> saveCarbsGoal() async {
-  //  if(int.tryParse(_carbsGoalController.text)==null) {
-  //    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Enter a value for carbs goal before saving"),duration: Duration(seconds: 2) ));
-  //  }
-  //  else{
-  //    dynamic settings = await SharedPreferences.getInstance();
-  //    await settings.setInt('carbsGoal', _carbsGoalController.text);
-  //  }
-  //}
-//
-  //Future<void> saveProteinGoal() async {
-  //  if(int.tryParse(_proteinGoalController.text)==null) {
-  //    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Enter a value for protein goal before saving"),duration: Duration(seconds: 2) ));
-  //  }
-  //  else{
-  //    dynamic settings = await SharedPreferences.getInstance();
-  //    await settings.setInt('proteinGoal', _proteinGoalController.text);
-  //  }
-  //}
-//
-  //Future<void> saveSaltGoal() async {
-  //  if(int.tryParse(_saltGoalController.text)==null) {
-  //    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Enter a value for salt goal before saving"),duration: Duration(seconds: 2) ));
-  //  }
-  //  else{
-  //    dynamic settings = await SharedPreferences.getInstance();
-  //    await settings.setInt('saltGoal', _saltGoalController.text);
-  //  }
-  //}
-//
-  //Future<void> saveFatGoal() async {
-  //  if(int.tryParse(_fatGoalController.text)==null) {
-  //    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Enter a value for fat goal before saving"),duration: Duration(seconds: 2) ));
-  //  }
-  //  else{
-  //    dynamic settings = await SharedPreferences.getInstance();
-  //    await settings.setInt('fatGoal', _fatGoalController.text);
-  //  }
-  //}
+  Future<void> setCarbsGoal() async {
+    if(int.tryParse(_carbsGoalController.text)==null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the carbs goal textbox"),duration: Duration(seconds: 2)));
+    }
+    else {
+      await FirebaseFirestore.instance.collection("settings").doc("goals").update({ "carbsgoal" : int.parse(_carbsGoalController.text) });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Carbohydrate goal updated"),duration: Duration(seconds: 2)));
+    }
+  }
+
+  Future<void> setProteinGoal() async {
+    if(int.tryParse(_proteinGoalController.text)==null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the protein goal textbox"),duration: Duration(seconds: 2)));
+    }
+    else {
+      await FirebaseFirestore.instance.collection("settings").doc("goals").update({ "proteingoal" : int.parse(_proteinGoalController.text) });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Protein goal updated"),duration: Duration(seconds: 2)));
+    }
+  }
+
+  Future<void> setSaltGoal() async {
+    if(int.tryParse(_saltGoalController.text)==null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the salt goal textbox"),duration: Duration(seconds: 2)));
+    }
+    else {
+      await FirebaseFirestore.instance.collection("settings").doc("goals").update({ "saltgoal" : int.parse(_saltGoalController.text) });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Salt goal updated"),duration: Duration(seconds: 2)));
+    }
+  }
+
+  Future<void> setFatGoal() async {
+    if(int.tryParse(_fatGoalController.text)==null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the fat goal textbox"),duration: Duration(seconds: 2)));
+    }
+    else {
+      await FirebaseFirestore.instance.collection("settings").doc("goals").update({ "fatgoal" : int.parse(_fatGoalController.text) });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Carbohydrate goal updated"),duration: Duration(seconds: 2)));
+    }
+  }
 
   @override
   void initState()
   {
     super.initState();
-    //loadGoals();
+    getGoals();
   }
 
   @override
@@ -106,7 +114,17 @@ class _SettingsPageState extends State<SettingsPage>
                       filled: true,
                       fillColor: Theme.of(context).primaryColor,
                       hintText: "Enter carbs goal",
-                      border: OutlineInputBorder()
+                      border: OutlineInputBorder(),
+                      suffixIcon:OutlinedButton(onPressed: setCarbsGoal, 
+                      child: Icon(Icons.check),
+                      style: ButtonStyle(
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6)
+                          )
+                        )
+                      ),
+                      )
                     ),
                   ),
                   ),
@@ -125,7 +143,7 @@ class _SettingsPageState extends State<SettingsPage>
                       fillColor: Theme.of(context).primaryColor,
                       hintText: "Enter protein goal",
                       border: OutlineInputBorder(),
-                      suffixIcon:OutlinedButton(onPressed: (){}, 
+                      suffixIcon:OutlinedButton(onPressed: setProteinGoal, 
                       child: Icon(Icons.check),
                       style: ButtonStyle(
                         shape: MaterialStateProperty.all(
@@ -152,7 +170,17 @@ class _SettingsPageState extends State<SettingsPage>
                       filled: true,
                       fillColor: Theme.of(context).primaryColor,
                       hintText: "Enter fat goal",
-                      border: OutlineInputBorder()
+                      border: OutlineInputBorder(),
+                      suffixIcon:OutlinedButton(onPressed: setFatGoal, 
+                      child: Icon(Icons.check),
+                      style: ButtonStyle(
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6)
+                          )
+                        )
+                      ),
+                      )
                     ),
                   ),
                   ),
@@ -170,7 +198,17 @@ class _SettingsPageState extends State<SettingsPage>
                       filled: true,
                       fillColor: Theme.of(context).primaryColor,
                       hintText: "Enter salt goal",
-                      border: OutlineInputBorder()
+                      border: OutlineInputBorder(),
+                      suffixIcon:OutlinedButton(onPressed: setSaltGoal, 
+                      child: Icon(Icons.check),
+                      style: ButtonStyle(
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6)
+                          )
+                        )
+                      ),
+                      )
                     ),
                   ),
                   ),

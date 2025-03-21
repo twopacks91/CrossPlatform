@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:foodfacts/Food.dart';
 import 'package:intl/intl.dart';
+import '../MyWidgets/GoalProgressCircle.dart';
 
 class GoalsPage extends StatefulWidget
 {
@@ -16,10 +17,10 @@ class GoalsPage extends StatefulWidget
 class _GoalsPageState extends State<GoalsPage>
 {
   // Read these from database
-  double carbsGoal = 100;
-  double proteinGoal = 25;
-  double saltGoal = 15;
-  double fatGoal = 25;
+  int carbsGoal = 100;
+  int proteinGoal = 100;
+  int saltGoal = 100;
+  int fatGoal = 100;
 
   double carbsTotal = 0;
   double proteinTotal = 0;
@@ -90,10 +91,26 @@ class _GoalsPageState extends State<GoalsPage>
     fetchMeals();
   }
 
+  Future<void> updateGoals() async {
+    dynamic doc = await FirebaseFirestore.instance.collection("settings").doc("goals").get();
+    Map<String,dynamic> docData = doc.data() as Map<String,dynamic>;
+    int carbs = docData["carbsgoal"];
+    int protein = docData["proteingoal"];
+    int salt = docData["saltgoal"];
+    int fat = docData["fatgoal"];
+    setState(() {
+      carbsGoal = carbs;
+      proteinGoal = protein;
+      saltGoal = salt;
+      fatGoal = fat;
+    });
+  }
+
   @override
   void initState()
   {
     super.initState();
+    updateGoals();
     fetchMeals();
   }
 
@@ -112,13 +129,53 @@ class _GoalsPageState extends State<GoalsPage>
         
         children: [
           Padding(padding: EdgeInsets.all(20)),
-          createProgressCircle(300, "Carbs", carbsProgress),
+          GoalProgressCircle(
+                diameter: 300, 
+                progress: carbsProgress,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("${carbsTotal}g"),
+                    Text("Carbs"),
+                  ]
+                ),
+              ),
           SizedBox(height: 20),
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, 
             children: [
-              createProgressCircle(100, "Protein", proteinProgress),
-              createProgressCircle(100, "Salt", saltProgress),
-              createProgressCircle(100, "Fat", fatProgress),
+              GoalProgressCircle(
+                diameter: 100, 
+                progress: proteinProgress,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("${proteinTotal}g"),
+                    Text("Protein"),
+                  ]
+                ),
+              ),
+              GoalProgressCircle(
+                diameter: 100, 
+                progress: saltProgress,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("${saltTotal}g"),
+                    Text("Salt"),
+                  ]
+                ),
+              ),
+              GoalProgressCircle(
+                diameter: 100, 
+                progress: fatProgress,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("${fatTotal}g"),
+                    Text("Fat"),
+                  ]
+                ),
+              ),
             ], 
           ),
           SizedBox(height: 20,),
@@ -131,7 +188,7 @@ class _GoalsPageState extends State<GoalsPage>
               border: Border.all(color: Theme.of(context).highlightColor),
               color: Theme.of(context).primaryColor
             ),
-            child: ( _meals.length==0 ? 
+            child: ( _meals.isEmpty ? 
             // If there are no meals tell the user
             Text("No meals listed for today",textAlign: TextAlign.center,) 
             : 
@@ -162,65 +219,11 @@ class _GoalsPageState extends State<GoalsPage>
                       )
                     ],
                   );
-                    
-                
               }
-            
             ))
           ))
         ],
       )
     );
-  }
-
-  Widget createProgressCircle(double diameter,String text, double progress)
-  {
-    double overrun = progress-1;
-    return Center(
-      child: 
-        Stack(
-          children: [
-            CircleAvatar(radius: (diameter/2),),
-            SizedBox(
-              width: diameter
-              ,height: diameter, 
-              child: CircularProgressIndicator(
-                semanticsLabel: text,
-                value: 1,
-                color: Theme.of(context).unselectedWidgetColor,
-                strokeWidth: 6,
-              )
-            ),
-            SizedBox(
-              width: diameter
-              ,height: diameter, 
-              child: CircularProgressIndicator(
-                semanticsLabel: text,
-                value: progress,
-                color: const Color.fromARGB(255, 179, 255, 92),
-                strokeWidth: 6,
-              )
-            ),
-            SizedBox(
-              width: diameter
-              ,height: diameter, 
-              child: CircularProgressIndicator(
-                semanticsLabel: text,
-                value: overrun,
-                color: const Color.fromARGB(255, 255, 0, 0),
-                strokeWidth: 6,
-              )
-            ),
-            SizedBox(
-              width: diameter,
-              height: diameter, 
-              child: Center(
-                child: Text(text,textScaler: TextScaler.linear(diameter/80)),
-                
-              )
-            )
-          ],
-        )
-      );
   }
 }

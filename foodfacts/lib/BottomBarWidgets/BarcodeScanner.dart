@@ -12,7 +12,7 @@ class _BarcodeScannerState extends State<Barcodescanner>
   @override
   Widget build(BuildContext context)
   {
-    return Scaffold(
+    return const Scaffold(
       body: Text("Unimplemented",textAlign: TextAlign.center,),
     );
   }

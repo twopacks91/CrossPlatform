@@ -22,7 +22,6 @@ void main() async{
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -39,18 +38,18 @@ class MyApp extends StatelessWidget {
 }
 
 // https://api.flutter.dev/flutter/material/BottomNavigationBar-class.html
-class BottomNavBar extends StatefulWidget
-{
+class BottomNavBar extends StatefulWidget {
   const BottomNavBar({super.key});
 
   @override
   State<BottomNavBar> createState()=> _BottomBarNavState();
 }
 
-class _BottomBarNavState extends State<BottomNavBar>
-{
+class _BottomBarNavState extends State<BottomNavBar> {
+
   int _selectedIndex = 0;
-  static const List<Widget> _widgetOptions = <Widget>[
+
+  static const List<Widget> _pages = <Widget>[
     GoalsPage(),
     SearchPage(),
     Barcodescanner(),
@@ -73,7 +72,7 @@ class _BottomBarNavState extends State<BottomNavBar>
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
+        child: _pages.elementAt(_selectedIndex),
       ),
       //https://www.geeksforgeeks.org/flutter-convex-bottombar/
       bottomNavigationBar: ConvexAppBar(
@@ -81,7 +80,7 @@ class _BottomBarNavState extends State<BottomNavBar>
           color: _inactiveIconColour,
           activeColor: _selectedIconColour,
           backgroundColor: _backgroundColour,
-          items: [
+          items: const [
             TabItem(
               icon: Icons.golf_course, 
               title: 'Goals',
