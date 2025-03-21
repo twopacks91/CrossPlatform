@@ -85,140 +85,152 @@ class _SettingsPageState extends State<SettingsPage>
     getGoals();
   }
 
+  Widget goalsTab()
+  {
+    return Container(
+            decoration: BoxDecoration(
+              border: Border.all(),
+            ),
+            child: ExpansionTile(
+              childrenPadding: EdgeInsets.all(8),
+              title: Text("Goals"),
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text("Carbs goal (g): "),
+                    SizedBox(width: 20,),
+                    SizedBox(
+                      width: 200,
+                      height: 45,
+                      child: TextField(
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      controller: _carbsGoalController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Theme.of(context).primaryColor,
+                        hintText: "Enter carbs goal",
+                        border: OutlineInputBorder(),
+                        suffixIcon:OutlinedButton(onPressed: setCarbsGoal, 
+                        child: Icon(Icons.check),
+                        style: ButtonStyle(
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6)
+                            )
+                          )
+                        ),
+                        )
+                      ),
+                    ),
+                    ),
+                    SizedBox(height: 8,),
+                    Text("Protein goal (g): "),
+                    SizedBox(width: 20,),
+                    SizedBox(
+                      width: 200,
+                      height: 45,
+                      child: TextField(
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      controller: _proteinGoalController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Theme.of(context).primaryColor,
+                        hintText: "Enter protein goal",
+                        border: OutlineInputBorder(),
+                        suffixIcon:OutlinedButton(onPressed: setProteinGoal, 
+                        child: Icon(Icons.check),
+                        style: ButtonStyle(
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6)
+                            )
+                          )
+                        ),
+                        )
+                      ),
+                    ),
+                    ),
+                    SizedBox(height: 8,),
+                    Text("Fat goal (g): "),
+                    SizedBox(width: 20,),
+                    SizedBox(
+                      width: 200,
+                      height: 45,
+                      child: TextField(
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      controller: _fatGoalController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Theme.of(context).primaryColor,
+                        hintText: "Enter fat goal",
+                        border: OutlineInputBorder(),
+                        suffixIcon:OutlinedButton(onPressed: setFatGoal, 
+                        child: Icon(Icons.check),
+                        style: ButtonStyle(
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6)
+                            )
+                          )
+                        ),
+                        )
+                      ),
+                    ),
+                    ),
+                    SizedBox(height: 8,),
+                    Text("Salt goal (g): "),
+                    SizedBox(width: 20,),
+                    SizedBox(
+                      width: 200,
+                      height: 45,
+                      child: TextField(
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      controller: _saltGoalController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Theme.of(context).primaryColor,
+                        hintText: "Enter salt goal",
+                        border: OutlineInputBorder(),
+                        suffixIcon:OutlinedButton(onPressed: setSaltGoal, 
+                        child: Icon(Icons.check),
+                        style: ButtonStyle(
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6)
+                            )
+                          )
+                        ),
+                        )
+                      ),
+                    ),
+                    ),
+                  ],
+                )
+              ],
+            )
+          );
+  }
+
   @override
   Widget build(BuildContext context) 
   {
     return Scaffold(
       backgroundColor: Theme.of(context).canvasColor,
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          ExpansionTile(
-            childrenPadding: EdgeInsets.all(8),
-            title: Text("Goals"),
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text("Carbs goal (g): "),
-                  SizedBox(width: 20,),
-                  SizedBox(
-                    width: 200,
-                    height: 45,
-                    child: TextField(
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    controller: _carbsGoalController,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Theme.of(context).primaryColor,
-                      hintText: "Enter carbs goal",
-                      border: OutlineInputBorder(),
-                      suffixIcon:OutlinedButton(onPressed: setCarbsGoal, 
-                      child: Icon(Icons.check),
-                      style: ButtonStyle(
-                        shape: MaterialStateProperty.all(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6)
-                          )
-                        )
-                      ),
-                      )
-                    ),
-                  ),
-                  ),
-                  SizedBox(height: 8,),
-                  Text("Protein goal (g): "),
-                  SizedBox(width: 20,),
-                  SizedBox(
-                    width: 200,
-                    height: 45,
-                    child: TextField(
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    controller: _proteinGoalController,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Theme.of(context).primaryColor,
-                      hintText: "Enter protein goal",
-                      border: OutlineInputBorder(),
-                      suffixIcon:OutlinedButton(onPressed: setProteinGoal, 
-                      child: Icon(Icons.check),
-                      style: ButtonStyle(
-                        shape: MaterialStateProperty.all(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6)
-                          )
-                        )
-                      ),
-                      )
-                    ),
-                  ),
-                  ),
-                  SizedBox(height: 8,),
-                  Text("Fat goal (g): "),
-                  SizedBox(width: 20,),
-                  SizedBox(
-                    width: 200,
-                    height: 45,
-                    child: TextField(
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    controller: _fatGoalController,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Theme.of(context).primaryColor,
-                      hintText: "Enter fat goal",
-                      border: OutlineInputBorder(),
-                      suffixIcon:OutlinedButton(onPressed: setFatGoal, 
-                      child: Icon(Icons.check),
-                      style: ButtonStyle(
-                        shape: MaterialStateProperty.all(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6)
-                          )
-                        )
-                      ),
-                      )
-                    ),
-                  ),
-                  ),
-                  SizedBox(height: 8,),
-                  Text("Salt goal (g): "),
-                  SizedBox(width: 20,),
-                  SizedBox(
-                    width: 200,
-                    height: 45,
-                    child: TextField(
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    controller: _saltGoalController,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Theme.of(context).primaryColor,
-                      hintText: "Enter salt goal",
-                      border: OutlineInputBorder(),
-                      suffixIcon:OutlinedButton(onPressed: setSaltGoal, 
-                      child: Icon(Icons.check),
-                      style: ButtonStyle(
-                        shape: MaterialStateProperty.all(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6)
-                          )
-                        )
-                      ),
-                      )
-                    ),
-                  ),
-                  ),
-                ],
-              )
-            ],
-            
-          )
+          SizedBox(height: 40),
+          Text("Settings",style: TextStyle(fontSize: 40),),
+          SizedBox(height: 10),
+          goalsTab()
         ],
       )
-      );
+    );
   }
 }
