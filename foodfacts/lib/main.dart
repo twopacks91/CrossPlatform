@@ -4,7 +4,8 @@ import 'BottomBarWidgets/SearchPage.dart';
 import 'BottomBarWidgets/GoalsPage.dart';
 import 'BottomBarWidgets/FavouritesPage.dart';
 import 'BottomBarWidgets/SettingsPage.dart';
-
+import 'BottomBarWidgets/BarcodeScanner.dart';
+import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -50,8 +51,9 @@ class _BottomBarNavState extends State<BottomNavBar>
 {
   int _selectedIndex = 0;
   static const List<Widget> _widgetOptions = <Widget>[
-    SearchPage(),
     GoalsPage(),
+    SearchPage(),
+    Barcodescanner(),
     FavouritesPage(),
     SettingsPage()
   ];
@@ -66,45 +68,71 @@ class _BottomBarNavState extends State<BottomNavBar>
   final Color _inactiveIconColour = const Color.fromARGB(255, 116, 116, 116);
   final Color _backgroundColour = const Color.fromARGB(192, 235, 221, 255);
 
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
-      bottomNavigationBar: Theme(
-        data: Theme.of(context).copyWith(
-          canvasColor: _backgroundColour,
-          shadowColor: Colors.amber
-        ), 
-        child: BottomNavigationBar(
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.search, color: 
-                (_selectedIndex==0) ? (_selectedIconColour) : (_inactiveIconColour)),
-              label: 'Search',
+      //https://www.geeksforgeeks.org/flutter-convex-bottombar/
+      bottomNavigationBar: ConvexAppBar(
+          style: TabStyle.fixedCircle,
+          color: _inactiveIconColour,
+          activeColor: _selectedIconColour,
+          backgroundColor: _backgroundColour,
+          items: [
+            TabItem(
+              icon: Icons.golf_course, 
+              title: 'Goals',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.golf_course, color: 
-                (_selectedIndex==1) ? (_selectedIconColour) : (_inactiveIconColour)),
-              label: 'Goals',
+            TabItem(
+              icon: Icons.search, 
+              title: 'Search'
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.star, color: 
-                (_selectedIndex==2) ? (_selectedIconColour) : (_inactiveIconColour)),
-              label: 'Favourites',
+            TabItem(
+              icon: Icons.qr_code_scanner, 
+              title: 'Scan'
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.settings, color: 
-                (_selectedIndex==3) ? (_selectedIconColour) : (_inactiveIconColour)),
-              label: 'Settings',
+            TabItem(
+              icon: Icons.star, 
+              title: 'Favourites'
+            ),
+            TabItem(
+              icon: Icons.settings, 
+              title: 'Settings'
             ),
           ],
-          currentIndex: _selectedIndex,
-          selectedItemColor: _selectedIconColour,
-          onTap: _onItemTapped,
-        ),
-      )
+          initialActiveIndex: _selectedIndex,
+          onTap: (int i) => _onItemTapped(i),
+        )
+        //BottomNavigationBar(
+        //  items: <BottomNavigationBarItem>[
+        //    BottomNavigationBarItem(
+        //      icon: Icon(Icons.search, color: 
+        //        (_selectedIndex==0) ? (_selectedIconColour) : (_inactiveIconColour)),
+        //      label: 'Search',
+        //    ),
+        //    BottomNavigationBarItem(
+        //      icon: Icon(Icons.golf_course, color: 
+        //        (_selectedIndex==1) ? (_selectedIconColour) : (_inactiveIconColour)),
+        //      label: 'Goals',
+        //    ),
+        //    BottomNavigationBarItem(
+        //      icon: Icon(Icons.star, color: 
+        //        (_selectedIndex==2) ? (_selectedIconColour) : (_inactiveIconColour)),
+        //      label: 'Favourites',
+        //    ),
+        //    BottomNavigationBarItem(
+        //      icon: Icon(Icons.settings, color: 
+        //        (_selectedIndex==3) ? (_selectedIconColour) : (_inactiveIconColour)),
+        //      label: 'Settings',
+        //    ),
+        //  ],
+        //  currentIndex: _selectedIndex,
+        //  selectedItemColor: _selectedIconColour,
+        //  onTap: _onItemTapped,
+        //),
     );
   }
 }
