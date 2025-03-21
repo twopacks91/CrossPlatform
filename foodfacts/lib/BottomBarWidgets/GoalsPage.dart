@@ -182,7 +182,7 @@ class _GoalsPageState extends State<GoalsPage>
           Padding(padding: EdgeInsets.all(8),child: 
           Container(
             width: 420,
-            height: 330,
+            height: 320,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(8)),
               border: Border.all(color: Theme.of(context).highlightColor),
@@ -195,13 +195,17 @@ class _GoalsPageState extends State<GoalsPage>
             // Else display meal list
             ListView.builder(
               itemCount: _meals.length,
+              padding: EdgeInsets.all(0),
               itemBuilder: (context,index){
-                return ExpansionTile(
+                return Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(),
+                  ),
+                  child: ExpansionTile(
                     title: Text("${_meals[index].name} : ${_meals[index].weight.toString()}g"),
+                    childrenPadding: EdgeInsets.all(8),
                     children: [
-                      Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Column(
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text("Time eaten: ${(_meals[index].timeAdded==null?"Time eaten not available":unixToTimeString(_meals[index].timeAdded!))}"),
@@ -215,12 +219,16 @@ class _GoalsPageState extends State<GoalsPage>
                               child: OutlinedButton(onPressed: ()=>{removeMeal(_meals[index])}, child: Text("Remove meal")),
                             )
                           ],
-                        ),
+                        
                       )
                     ],
-                  );
+                  )
+                );
+                
+                
               }
-            ))
+            )
+            )
           ))
         ],
       )
