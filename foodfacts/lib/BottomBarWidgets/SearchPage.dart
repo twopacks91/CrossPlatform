@@ -120,8 +120,8 @@ class _SearchPageState extends State<SearchPage>
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(8)),
-                color: Color.fromARGB(255, 235, 221, 255),
-                border: Border.all(color: Colors.deepPurple)
+                color: Theme.of(context).primaryColor,
+                border: Border.all(color: Theme.of(context).highlightColor)
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -148,7 +148,7 @@ class _SearchPageState extends State<SearchPage>
   Scaffold foodList()
   {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(96, 81, 58, 183),
+      backgroundColor: Theme.of(context).canvasColor,
       body: Column(
         children: [
           Padding(
@@ -157,7 +157,7 @@ class _SearchPageState extends State<SearchPage>
               child: TextField(
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: Color.fromARGB(255, 235, 221, 255),
+                  fillColor: Theme.of(context).primaryColor,
                   hintText: "Enter food name",
                   border: OutlineInputBorder(),
                   suffixIcon: IconButton(
@@ -263,7 +263,7 @@ class _SearchPageState extends State<SearchPage>
   Scaffold foodInfo()
   {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(96, 81, 58, 183),
+      backgroundColor: Theme.of(context).canvasColor,
       body: Padding(
         padding: EdgeInsets.all(12),
         child: Column(
@@ -321,7 +321,7 @@ class _SearchPageState extends State<SearchPage>
               width: 420,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: Colors.deepPurple)
+                border: Border.all(color: Theme.of(context).highlightColor)
               ),
               child: Column(
                 children: [

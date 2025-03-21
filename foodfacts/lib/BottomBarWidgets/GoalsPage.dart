@@ -141,7 +141,6 @@ class _GoalsPageState extends State<GoalsPage>
               itemBuilder: (context,index){
                 return ExpansionTile(
                     title: Text("${_meals[index].name} : ${_meals[index].weight.toString()}g"),
-                    trailing: Icon(Icons.arrow_drop_down),
                     children: [
                       Padding(
                         padding: EdgeInsets.all(8),
@@ -209,7 +208,7 @@ class _GoalsPageState extends State<GoalsPage>
                 semanticsLabel: text,
                 value: overrun,
                 color: const Color.fromARGB(255, 255, 0, 0),
-                strokeWidth: 3,
+                strokeWidth: 6,
               )
             ),
             SizedBox(
