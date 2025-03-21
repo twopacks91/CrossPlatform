@@ -22,14 +22,15 @@ void main() async{
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        primaryColor: const Color.fromARGB(255, 235, 221, 255),
-        unselectedWidgetColor: const Color.fromARGB(255, 215, 191, 248),
+        primaryColor: const Color.fromARGB(255, 235, 220, 255),
+        unselectedWidgetColor: const Color.fromARGB(255, 215, 190, 250),
         highlightColor: Colors.deepPurple,
-        canvasColor: const Color.fromARGB(96, 81, 58, 183),
+        canvasColor: const Color.fromARGB(255, 190, 180, 230),
         useMaterial3: true,
       ),
       home: const BottomNavBar(),

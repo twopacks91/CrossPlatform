@@ -151,6 +151,7 @@ class _SearchPageState extends State<SearchPage>
       backgroundColor: Theme.of(context).canvasColor,
       body: Column(
         children: [
+          SizedBox(height: 20),
           Padding(
             padding: 
             EdgeInsets.all(12),
@@ -271,7 +272,6 @@ class _SearchPageState extends State<SearchPage>
           children: [
             SizedBox(height: 20,),
             SizedBox(
-              width: 400,
               height: 200,
               child: Image.network(
                 _foodList[_foodInfoIndex].imageUrl,
@@ -287,7 +287,11 @@ class _SearchPageState extends State<SearchPage>
                   width: 50,
                   height: 50,
                   child:OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                    ),
                     onPressed: decreaseWeight,
+                    
                     child: Text('-')
                   ),
                 ),
@@ -298,6 +302,8 @@ class _SearchPageState extends State<SearchPage>
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     decoration: InputDecoration(
                       hintText: "Enter weight",
+                      filled:true,
+                      fillColor: Theme.of(context).primaryColor,
                       border: OutlineInputBorder(),
                     ),
                   controller: _weightEntryController,
@@ -309,8 +315,11 @@ class _SearchPageState extends State<SearchPage>
                   width: 50,
                   height: 50,
                   child:OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                    ),
                     onPressed: increaseWeight,
-                    child: Text('+')
+                    child: Text('+',style: TextStyle(fontSize: 20))
                   ),
                 ),
               ],
@@ -319,17 +328,20 @@ class _SearchPageState extends State<SearchPage>
             Container(
               padding: EdgeInsets.all(12),
               width: 420,
+              height: 300,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: Theme.of(context).highlightColor)
+                border: Border.all(color: Theme.of(context).highlightColor),
+                color: Theme.of(context).primaryColor,
               ),
               child: Column(
                 children: [
-                  Text("Calories: ${_foodList[_foodInfoIndex].calories}kcal"),
-                  Text("Carbs   : ${_foodList[_foodInfoIndex].carbs}g"),
-                  Text("Protein : ${_foodList[_foodInfoIndex].protein}g"),
-                  Text("Salt    : ${_foodList[_foodInfoIndex].salt}g"),
-                  Text("Fat     : ${_foodList[_foodInfoIndex].fat}g"),
+                  
+                  Text("Calories: ${_foodList[_foodInfoIndex].calories}kcal",style: TextStyle(fontSize: 20)),
+                  Text("Carbs   : ${_foodList[_foodInfoIndex].carbs}g",style: TextStyle(fontSize: 20)),
+                  Text("Protein : ${_foodList[_foodInfoIndex].protein}g",style: TextStyle(fontSize: 20)),
+                  Text("Salt    : ${_foodList[_foodInfoIndex].salt}g",style: TextStyle(fontSize: 20)),
+                  Text("Fat     : ${_foodList[_foodInfoIndex].fat}g",style: TextStyle(fontSize: 20)),
                 ],
               ),
             ),
@@ -341,6 +353,9 @@ class _SearchPageState extends State<SearchPage>
                   width: 120,
                   height: 50,
                   child:OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                    ),
                     onPressed: backToItemsPage,
                     child: Text('Back')
                   ),
@@ -349,6 +364,9 @@ class _SearchPageState extends State<SearchPage>
                   width: 120,
                   height: 50,
                   child:OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                    ),
                     onPressed: confirmSelection,
                     child: Text('Confirm selection')
                   ),
@@ -362,28 +380,37 @@ class _SearchPageState extends State<SearchPage>
                       bool isFavourited = snapshot.data ?? false;
                       return (isFavourited?
                         OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                    ),
                           onPressed: removeFoodFromFavourites,
-                          child: Text('Remove from favourites')
+                          child: Text('Remove favourite')
                         )
                       :
                         OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                    ),
                           onPressed: addFoodToFavourites,
-                          child: Text('Add food to favourites')
+                          child: Text('Add to favourites')
                         )
                       );
                     }
                     else
                     {
                       return OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                    ),
                           onPressed: (){ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Still talking with database, try again later"),duration: Duration(seconds: 2),));},
-                          child: Text('Add food to favourites')
+                          child: Text('Add to favourites')
                         );
                     }
                   })
                   )
-                
               ],
-            )
+            ),
+            SizedBox(height: 20,)
           ],
         ),
       )
