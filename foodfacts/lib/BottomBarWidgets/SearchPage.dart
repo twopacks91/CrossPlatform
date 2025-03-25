@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:foodfacts/Food.dart';
+import 'package:shimmer/shimmer.dart';
 
 class SearchPage extends StatefulWidget
 {
@@ -20,14 +21,17 @@ class _SearchPageState extends State<SearchPage>
   TextEditingController _searchBarController = TextEditingController();
   TextEditingController _weightEntryController = TextEditingController();
   String query = 'jaffa cake';
-  bool _showFoodInfo = false;
+  bool _showFoodInfoScreen = false;
   int _foodInfoIndex = 0;
+  bool _showSkeletonUI = false;
+  bool _failedToFetchFoods = false;
 
   Future<void> fetchFoods() async {
     query = _searchBarController.text;
     final uri = Uri.parse('https://world.openfoodfacts.org/cgi/search.pl?search_terms=$query&json=true');
-    final response = await http.get(uri);
-    List<Food> newFoods = [];
+    try{
+      final response = await http.get(uri);
+      List<Food> newFoods = [];
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final products = data['products'] as List<dynamic>;
@@ -37,11 +41,6 @@ class _SearchPageState extends State<SearchPage>
         final String? imageUrl = product['image_url'];
         final String? barcode = product['code'];
         final nutriments = product['nutriments'] as Map<String, dynamic>;
-        
-        //nutriments["carbohydrates_value"]
-        //nutriments["energy_value"]
-        //nutriments["fat_value"]
-        //nutriments["salt_100g"]
         
         final double? calories = (nutriments['energy_value'])?.toDouble();
         final double? carbs = (nutriments['carbohydrates_value'])?.toDouble();
@@ -63,11 +62,24 @@ class _SearchPageState extends State<SearchPage>
       }
       setState(() {
         _foodList = newFoods;
+        _failedToFetchFoods = false;
       });
     } 
     else {
       print('Failed to fetch products');
+      setState(() {
+        _failedToFetchFoods = true;
+      });
     }
+    }
+    catch(ex){
+      print("No wifi probs");
+      setState(() {
+        _failedToFetchFoods = true;
+      });
+      return;
+    }
+    
   }
 
   void addFoodToFavourites() async
@@ -75,7 +87,7 @@ class _SearchPageState extends State<SearchPage>
     Food food = _foodList[_foodInfoIndex];
     await FirebaseFirestore.instance.collection("favfoods").doc(food.barcode).set(food.asMap());
     setState(() {
-      _showFoodInfo = false;
+      _showFoodInfoScreen = false;
     });
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food added to favourites list"),duration: Duration(seconds: 2),));
   }
@@ -83,7 +95,7 @@ class _SearchPageState extends State<SearchPage>
   void removeFoodFromFavourites() async
   {
     setState(() {
-      _showFoodInfo = false;
+      _showFoodInfoScreen = false;
     });
     Food food = _foodList[_foodInfoIndex];
     await FirebaseFirestore.instance.collection("favfoods").doc(food.barcode).delete();
@@ -93,59 +105,123 @@ class _SearchPageState extends State<SearchPage>
   void tappedFood(int index)
   {
     setState(() {
-      _showFoodInfo = true;
+      _showFoodInfoScreen = true;
       _foodInfoIndex = index;
     });
 
   }
 
-
-  GridView itemViewer()
-  {
+  GridView foodGridSkeleton(){
     return GridView.builder(
-        padding: const EdgeInsets.all(8),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.7,
-          crossAxisSpacing: 8.0,
-          mainAxisSpacing: 8.0,
-        ),
-        itemCount: _foodList.length,
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () {
-              tappedFood(index);
-            },
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-                color: Theme.of(context).primaryColor,
-                border: Border.all(color: Theme.of(context).highlightColor)
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.7,
+        crossAxisSpacing: 8.0,
+        mainAxisSpacing: 8.0,
+      ), 
+      padding: EdgeInsets.all(8),
+      itemCount: 6,
+      itemBuilder: (context,index) {
+        return Shimmer.fromColors(
+          baseColor: Theme.of(context).primaryColor, 
+          highlightColor: Colors.grey.shade100,
+          child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                  color: Theme.of(context).primaryColor,
+                  border: Border.all(color: Theme.of(context).highlightColor)
+                ),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.network(
-                    _foodList[index].imageUrl,
-                    height: 150,
-                    fit: BoxFit.fill,
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    _foodList[index].name,
-                    style: const TextStyle(color: Colors.black, fontSize: 16),
-                  ),
-                ],
-              ),
-            ),
-          );
-          
-        },
-      );
+        );
+      }
+    );
   }
 
-  Scaffold foodList()
+  Widget foodGrid() {
+    if(_showSkeletonUI) {
+      return foodGridSkeleton();
+    }
+    else if(_foodList.isEmpty)
+    {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(),
+              borderRadius: BorderRadius.circular(8),
+              color: Theme.of(context).primaryColor
+            ),
+            width: 300,
+            height: 200,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [ (_failedToFetchFoods?
+                Text("Something went wrong :("):
+                Text("Please enter the name of a food in the text box above")
+              )
+              ],
+            ),
+          )
+        ],
+      );
+    }
+    else {
+      return GridView.builder(
+          padding: const EdgeInsets.all(8),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 0.7,
+            crossAxisSpacing: 8.0,
+            mainAxisSpacing: 8.0,
+          ),
+          itemCount: _foodList.length,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () {
+                tappedFood(index);
+              },
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                  color: Theme.of(context).primaryColor,
+                  border: Border.all(color: Theme.of(context).highlightColor)
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.network(
+                      _foodList[index].imageUrl,
+                      height: 150,
+                      fit: BoxFit.fill,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      _foodList[index].name,
+                      style: const TextStyle(color: Colors.black, fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
+            );
+
+          },
+        );
+      }
+  }
+
+  void updateFoodList() async {
+    setState(() {
+      _showSkeletonUI = true;
+    });
+    await fetchFoods();
+    setState(() {
+      _showSkeletonUI = false;
+    });
+  }
+  Scaffold foodSearchScreen()
   {
     return Scaffold(
       backgroundColor: Theme.of(context).canvasColor,
@@ -162,14 +238,14 @@ class _SearchPageState extends State<SearchPage>
                   hintText: "Enter food name",
                   border: OutlineInputBorder(),
                   suffixIcon: IconButton(
-                    onPressed: fetchFoods, 
+                    onPressed: updateFoodList, 
                     icon: Icon(Icons.search)
                   )
                 ),
                 controller: _searchBarController
               ),
             ),
-            Expanded(child: itemViewer(),
+            Expanded(child: foodGrid(),
           ),
         ],
       ),
@@ -208,12 +284,6 @@ class _SearchPageState extends State<SearchPage>
     });
   }
 
-  void confirmSelection()
-  {
-    addMealToDB();
-    
-    
-  }
 
   void addMealToDB() async
   {
@@ -227,7 +297,7 @@ class _SearchPageState extends State<SearchPage>
       food.weight = weight;
       await FirebaseFirestore.instance.collection("meals").doc(docName).set(food.asMap());
       setState(() {
-      _showFoodInfo = false;
+      _showFoodInfoScreen = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal added"),duration: Duration(seconds: 2),));
     }
@@ -240,7 +310,7 @@ class _SearchPageState extends State<SearchPage>
   void backToItemsPage()
   {
     setState(() {
-      _showFoodInfo = false;
+      _showFoodInfoScreen = false;
     });
   }
 
@@ -261,7 +331,7 @@ class _SearchPageState extends State<SearchPage>
     }
   }
 
-  Scaffold foodInfo()
+  Scaffold foodInfoScreen()
   {
     return Scaffold(
       backgroundColor: Theme.of(context).canvasColor,
@@ -367,7 +437,7 @@ class _SearchPageState extends State<SearchPage>
                     style: OutlinedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
-                    onPressed: confirmSelection,
+                    onPressed: addMealToDB,
                     child: Text('Confirm selection')
                   ),
                 ),
@@ -419,6 +489,6 @@ class _SearchPageState extends State<SearchPage>
 
   @override
   Widget build(BuildContext context) {
-    return (_showFoodInfo? foodInfo():foodList());
+    return (_showFoodInfoScreen? foodInfoScreen():foodSearchScreen());
   }
 }
