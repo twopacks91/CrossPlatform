@@ -115,7 +115,6 @@ class _FavouritesPageState extends State<FavouritesPage>
                   const SizedBox(height: 10),
                   Text(
                     _foodList[index].name,
-                    style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0), fontSize: 16),
                   ),
                 ],
               ),
@@ -246,7 +245,6 @@ class _FavouritesPageState extends State<FavouritesPage>
             Expanded(child: SizedBox(),),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              
               children: [
                 SizedBox(
                   width: 50,
@@ -256,8 +254,7 @@ class _FavouritesPageState extends State<FavouritesPage>
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                     onPressed: decreaseWeight,
-                    
-                    child: Text('-')
+                    child: Text('-',style: Theme.of(context).textTheme.bodyLarge,)
                   ),
                 ),
                 SizedBox(width: 8,),
@@ -267,6 +264,7 @@ class _FavouritesPageState extends State<FavouritesPage>
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     decoration: InputDecoration(
                       hintText: "Enter weight",
+                      hintStyle: Theme.of(context).textTheme.bodyLarge,
                       filled:true,
                       fillColor: Theme.of(context).primaryColor,
                       border: OutlineInputBorder(),
@@ -284,7 +282,7 @@ class _FavouritesPageState extends State<FavouritesPage>
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                     onPressed: increaseWeight,
-                    child: Text('+',style: TextStyle(fontSize: 20))
+                    child: Text('+',style: Theme.of(context).textTheme.bodyLarge)
                   ),
                 ),
               ],
@@ -322,7 +320,7 @@ class _FavouritesPageState extends State<FavouritesPage>
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                     onPressed: backToItemsPage,
-                    child: Text('Back')
+                    child: Text('Back',style: Theme.of(context).textTheme.bodyLarge)
                   ),
                 ),
                 SizedBox(
@@ -332,8 +330,8 @@ class _FavouritesPageState extends State<FavouritesPage>
                     style: OutlinedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
-                    onPressed: confirmSelection,
-                    child: Text('Confirm selection')
+                    onPressed: addMealToDB,
+                    child: Text('Confirm selection',style: Theme.of(context).textTheme.bodyLarge)
                   ),
                 ),
                 SizedBox(
@@ -345,7 +343,7 @@ class _FavouritesPageState extends State<FavouritesPage>
                         backgroundColor: Theme.of(context).primaryColor,
                         ),
                       onPressed: removeFoodFromFavourites,
-                      child: Text('Remove favourite')
+                      child: Text('Remove favourite',style: Theme.of(context).textTheme.bodyLarge)
                     )
                 )
               ],

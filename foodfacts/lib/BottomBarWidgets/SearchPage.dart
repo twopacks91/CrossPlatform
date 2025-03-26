@@ -111,6 +111,7 @@ class _SearchPageState extends State<SearchPage>
 
   }
 
+  // Used when waiting for API to return meaningful data
   GridView foodGridSkeleton(){
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -124,7 +125,7 @@ class _SearchPageState extends State<SearchPage>
       itemBuilder: (context,index) {
         return Shimmer.fromColors(
           baseColor: Theme.of(context).primaryColor, 
-          highlightColor: Colors.grey.shade100,
+          highlightColor: Theme.of(context).unselectedWidgetColor,
           child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
@@ -199,8 +200,7 @@ class _SearchPageState extends State<SearchPage>
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      _foodList[index].name,
-                      style: const TextStyle(color: Colors.black, fontSize: 16),
+                      _foodList[index].name
                     ),
                   ],
                 ),
@@ -237,6 +237,8 @@ class _SearchPageState extends State<SearchPage>
                   fillColor: Theme.of(context).primaryColor,
                   hintText: "Enter food name",
                   border: OutlineInputBorder(),
+                  focusColor: Theme.of(context).highlightColor,
+                  suffixIconColor: Theme.of(context).highlightColor,
                   suffixIcon: IconButton(
                     onPressed: updateFoodList, 
                     icon: Icon(Icons.search)
@@ -351,7 +353,6 @@ class _SearchPageState extends State<SearchPage>
             Expanded(child: SizedBox(),),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              
               children: [
                 SizedBox(
                   width: 50,
@@ -361,8 +362,7 @@ class _SearchPageState extends State<SearchPage>
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                     onPressed: decreaseWeight,
-                    
-                    child: Text('-')
+                    child: Text('-',style: Theme.of(context).textTheme.bodyLarge,)
                   ),
                 ),
                 SizedBox(width: 8,),
@@ -372,6 +372,7 @@ class _SearchPageState extends State<SearchPage>
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     decoration: InputDecoration(
                       hintText: "Enter weight",
+                      hintStyle: Theme.of(context).textTheme.bodyLarge,
                       filled:true,
                       fillColor: Theme.of(context).primaryColor,
                       border: OutlineInputBorder(),
@@ -389,7 +390,7 @@ class _SearchPageState extends State<SearchPage>
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                     onPressed: increaseWeight,
-                    child: Text('+',style: TextStyle(fontSize: 20))
+                    child: Text('+',style: Theme.of(context).textTheme.bodyLarge)
                   ),
                 ),
               ],
@@ -427,7 +428,7 @@ class _SearchPageState extends State<SearchPage>
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                     onPressed: backToItemsPage,
-                    child: Text('Back')
+                    child: Text('Back',style: Theme.of(context).textTheme.bodyLarge)
                   ),
                 ),
                 SizedBox(
@@ -438,7 +439,7 @@ class _SearchPageState extends State<SearchPage>
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                     onPressed: addMealToDB,
-                    child: Text('Confirm selection')
+                    child: Text('Confirm selection',style: Theme.of(context).textTheme.bodyLarge)
                   ),
                 ),
                 SizedBox(
@@ -454,7 +455,7 @@ class _SearchPageState extends State<SearchPage>
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                           onPressed: removeFoodFromFavourites,
-                          child: Text('Remove favourite')
+                          child: Text('Remove favourites',style: Theme.of(context).textTheme.bodyLarge)
                         )
                       :
                         OutlinedButton(
@@ -462,7 +463,7 @@ class _SearchPageState extends State<SearchPage>
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                           onPressed: addFoodToFavourites,
-                          child: Text('Add to favourites')
+                          child: Text('Add to favourites',style: Theme.of(context).textTheme.bodyLarge)
                         )
                       );
                     }
@@ -473,7 +474,7 @@ class _SearchPageState extends State<SearchPage>
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                           onPressed: (){ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Still talking with database, try again later"),duration: Duration(seconds: 2),));},
-                          child: Text('Add to favourites')
+                          child: Text('Add to favourites',style: Theme.of(context).textTheme.bodyLarge)
                         );
                     }
                   })

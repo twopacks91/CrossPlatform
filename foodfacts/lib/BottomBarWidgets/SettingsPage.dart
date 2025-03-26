@@ -93,7 +93,7 @@ class _SettingsPageState extends State<SettingsPage>
             ),
             child: ExpansionTile(
               childrenPadding: EdgeInsets.all(8),
-              title: Text("Goals"),
+              title: Text("Goals",style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color)),
               children: [
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,

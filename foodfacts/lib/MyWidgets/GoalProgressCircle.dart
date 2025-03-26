@@ -15,7 +15,10 @@ class GoalProgressCircle extends StatelessWidget{
       child: 
         Stack(
           children: [
-            CircleAvatar(radius: (diameter/2),),
+            CircleAvatar(
+              radius: (diameter/2),
+              backgroundColor: Theme.of(context).primaryColor,
+            ),
             SizedBox(
               width: diameter
               ,height: diameter, 

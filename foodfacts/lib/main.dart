@@ -26,12 +26,28 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      //theme: ThemeData(
+      //  primaryColor: const Color.fromARGB(255, 235, 220, 255),
+      //  unselectedWidgetColor: const Color.fromARGB(255, 215, 190, 250),
+      //  highlightColor: Colors.deepPurple,
+      //  canvasColor: const Color.fromARGB(255, 190, 180, 230),
+      //  useMaterial3: true,
+      //  textTheme: TextTheme(
+      //    bodyLarge: TextStyle(color: Colors.black),
+      //    bodyMedium: TextStyle(color: Colors.black),
+      //  )
+      //),
       theme: ThemeData(
-        primaryColor: const Color.fromARGB(255, 235, 220, 255),
-        unselectedWidgetColor: const Color.fromARGB(255, 215, 190, 250),
-        highlightColor: Colors.deepPurple,
-        canvasColor: const Color.fromARGB(255, 190, 180, 230),
+        primaryColor: const Color.fromARGB(255, 50, 40, 80),
+        unselectedWidgetColor: const Color.fromARGB(255, 100, 80, 150),
+        highlightColor: Colors.deepPurpleAccent,
+        canvasColor: const Color.fromARGB(255, 30, 25, 50),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 20, 18, 40),
         useMaterial3: true,
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(color: Colors.white),
+          bodyMedium: TextStyle(color: Colors.white),
+        )
       ),
       home: const BottomNavBar(),
     );
@@ -68,9 +84,6 @@ class _BottomBarNavState extends State<BottomNavBar> {
   final Color _inactiveIconColour = const Color.fromARGB(255, 116, 116, 116);
   final Color _backgroundColour = const Color.fromARGB(192, 235, 221, 255);
 
-  
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,35 +119,8 @@ class _BottomBarNavState extends State<BottomNavBar> {
             ),
           ],
           initialActiveIndex: _selectedIndex,
-          onTap: (int i) => _onItemTapped(i),
+          onTap: (index) => _onItemTapped(index),
         )
-        //BottomNavigationBar(
-        //  items: <BottomNavigationBarItem>[
-        //    BottomNavigationBarItem(
-        //      icon: Icon(Icons.search, color: 
-        //        (_selectedIndex==0) ? (_selectedIconColour) : (_inactiveIconColour)),
-        //      label: 'Search',
-        //    ),
-        //    BottomNavigationBarItem(
-        //      icon: Icon(Icons.golf_course, color: 
-        //        (_selectedIndex==1) ? (_selectedIconColour) : (_inactiveIconColour)),
-        //      label: 'Goals',
-        //    ),
-        //    BottomNavigationBarItem(
-        //      icon: Icon(Icons.star, color: 
-        //        (_selectedIndex==2) ? (_selectedIconColour) : (_inactiveIconColour)),
-        //      label: 'Favourites',
-        //    ),
-        //    BottomNavigationBarItem(
-        //      icon: Icon(Icons.settings, color: 
-        //        (_selectedIndex==3) ? (_selectedIconColour) : (_inactiveIconColour)),
-        //      label: 'Settings',
-        //    ),
-        //  ],
-        //  currentIndex: _selectedIndex,
-        //  selectedItemColor: _selectedIconColour,
-        //  onTap: _onItemTapped,
-        //),
     );
   }
 }

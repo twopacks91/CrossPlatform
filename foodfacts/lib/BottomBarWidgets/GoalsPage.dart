@@ -200,9 +200,10 @@ class _GoalsPageState extends State<GoalsPage>
                 return Container(
                   decoration: BoxDecoration(
                     border: Border.all(),
+                    color: Theme.of(context).unselectedWidgetColor
                   ),
                   child: ExpansionTile(
-                    title: Text("${_meals[index].name} : ${_meals[index].weight.toString()}g"),
+                    title: Text("${_meals[index].name} : ${_meals[index].weight.toString()}g",style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color),),
                     childrenPadding: EdgeInsets.all(8),
                     children: [
                         Column(
