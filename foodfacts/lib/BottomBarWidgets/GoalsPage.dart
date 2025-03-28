@@ -119,6 +119,8 @@ class _GoalsPageState extends State<GoalsPage>
     DateTime dt =DateTime.fromMillisecondsSinceEpoch(unix).toLocal();
     return DateFormat('HH:mm').format(dt);
   }
+
+
   
   @override
   Widget build(BuildContext context) 
@@ -135,7 +137,7 @@ class _GoalsPageState extends State<GoalsPage>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("${carbsTotal}g"),
+                    Text("${carbsTotal.round()}g"),
                     Text("Carbs"),
                   ]
                 ),
@@ -149,7 +151,7 @@ class _GoalsPageState extends State<GoalsPage>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("${proteinTotal}g",style: Theme.of(context).textTheme.bodyLarge),
+                    Text("${proteinTotal.round()}g",style: Theme.of(context).textTheme.bodyLarge),
                     Text("Protein"),
                   ]
                 ),
@@ -160,7 +162,7 @@ class _GoalsPageState extends State<GoalsPage>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("${saltTotal}g",style: Theme.of(context).textTheme.bodyLarge),
+                    Text("${saltTotal.round()}g",style: Theme.of(context).textTheme.bodyLarge),
                     Text("Salt"),
                   ]
                 ),
@@ -171,7 +173,7 @@ class _GoalsPageState extends State<GoalsPage>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("${fatTotal}g",style: Theme.of(context).textTheme.bodyLarge),
+                    Text("${fatTotal.round()}g",style: Theme.of(context).textTheme.bodyLarge),
                     Text("Fat"),
                   ]
                 ),
@@ -210,11 +212,11 @@ class _GoalsPageState extends State<GoalsPage>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text("Time eaten: ${(_meals[index].timeAdded==null?"Time eaten not available":unixToTimeString(_meals[index].timeAdded!))}"),
-                            Text("Calories  : ${_meals[index].calories}kcal"),
-                            Text("Carbs     : ${_meals[index].carbs}g"),
-                            Text("Protein   : ${_meals[index].protein}g"),
-                            Text("Salt      : ${_meals[index].salt}g"),
-                            Text("Fat       : ${_meals[index].fat}g"),
+                            Text("Calories  : ${_meals[index].calories.round()}kcal"),
+                            Text("Carbs     : ${_meals[index].carbs.round()}g"),
+                            Text("Protein   : ${_meals[index].protein.round()}g"),
+                            Text("Salt      : ${_meals[index].salt.round()}g"),
+                            Text("Fat       : ${_meals[index].fat.round()}g"),
                             SizedBox(height: 10,),
                             Center(
                               child: OutlinedButton(onPressed: ()=>{removeMeal(_meals[index])}, child: Text("Remove meal",style: Theme.of(context).textTheme.bodyLarge)),
