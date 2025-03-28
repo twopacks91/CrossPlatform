@@ -212,6 +212,7 @@ class _SettingsPageState extends State<SettingsPage>
                       height: 45,
                       child: TextField(
                       keyboardType: TextInputType.number,
+
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       controller: _carbsGoalController,
                       decoration: InputDecoration(
@@ -334,9 +335,17 @@ class _SettingsPageState extends State<SettingsPage>
           SizedBox(height: 40),
           Text("Settings",style: TextStyle(fontSize: 40),),
           SizedBox(height: 10),
-          goalsTab(),
-          mealHistoryTab()
-        ],
+          Expanded(child: 
+            SingleChildScrollView(
+              child: Column(
+                children: [
+                  goalsTab(),
+                  mealHistoryTab()
+                ]
+              )
+            )
+          )
+        ]
       )
     );
   }
