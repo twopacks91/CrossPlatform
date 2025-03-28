@@ -31,19 +31,24 @@ class _BarcodeScannerState extends State<Barcodescanner>
     
     result = await SimpleBarcodeScanner.scanBarcode(
     context,
-    scanFormat: ScanFormat.ONLY_BARCODE
+    scanFormat: ScanFormat.ONLY_BARCODE,
+    //lineColor: Theme.of(context).highlightColor.toString()
     );
-    if(result != null)
+    if(result==(-1).toString())
     {
-      
+      setState(() {
+        _showError = true;
+        _errorMessage = "Exited barcode scan";
+      });
+    }
+    else if(result != null)
+    {
       setState(() {
         _scannedBarcode = result!;
         _showError = false;
       });
       await fetchFood();
     }
-    
-    
   }
 
   void showError(String message)
