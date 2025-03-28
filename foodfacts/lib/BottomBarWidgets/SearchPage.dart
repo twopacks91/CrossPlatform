@@ -428,7 +428,7 @@ class _SearchPageState extends State<SearchPage>
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                     onPressed: backToItemsPage,
-                    child: Text('Back',style: Theme.of(context).textTheme.bodyLarge)
+                    child: Text('Back',style: Theme.of(context).textTheme.bodyMedium)
                   ),
                 ),
                 SizedBox(
@@ -439,7 +439,7 @@ class _SearchPageState extends State<SearchPage>
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                     onPressed: addMealToDB,
-                    child: Text('Confirm selection',style: Theme.of(context).textTheme.bodyLarge)
+                    child: Text('Confirm meal',style: Theme.of(context).textTheme.bodyMedium)
                   ),
                 ),
                 SizedBox(
@@ -455,7 +455,7 @@ class _SearchPageState extends State<SearchPage>
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                           onPressed: removeFoodFromFavourites,
-                          child: Text('Remove favourites',style: Theme.of(context).textTheme.bodyLarge)
+                          child: Text('Remove favourite',style: Theme.of(context).textTheme.bodyMedium)
                         )
                       :
                         OutlinedButton(
@@ -463,7 +463,7 @@ class _SearchPageState extends State<SearchPage>
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                           onPressed: addFoodToFavourites,
-                          child: Text('Add to favourites',style: Theme.of(context).textTheme.bodyLarge)
+                          child: Text('Add to favourites',style: Theme.of(context).textTheme.bodyMedium)
                         )
                       );
                     }
@@ -474,7 +474,7 @@ class _SearchPageState extends State<SearchPage>
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                           onPressed: (){ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Still talking with database, try again later"),duration: Duration(seconds: 2),));},
-                          child: Text('Add to favourites',style: Theme.of(context).textTheme.bodyLarge)
+                          child: Text('Add to favourites',style: Theme.of(context).textTheme.bodyMedium)
                         );
                     }
                   })

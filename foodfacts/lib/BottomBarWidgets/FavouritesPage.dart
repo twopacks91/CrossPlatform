@@ -320,7 +320,7 @@ class _FavouritesPageState extends State<FavouritesPage>
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                     onPressed: backToItemsPage,
-                    child: Text('Back',style: Theme.of(context).textTheme.bodyLarge)
+                    child: Text('Back',style: Theme.of(context).textTheme.bodyMedium)
                   ),
                 ),
                 SizedBox(
@@ -331,7 +331,7 @@ class _FavouritesPageState extends State<FavouritesPage>
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                     onPressed: addMealToDB,
-                    child: Text('Confirm selection',style: Theme.of(context).textTheme.bodyLarge)
+                    child: Text('Confirm meal',style: Theme.of(context).textTheme.bodyMedium)
                   ),
                 ),
                 SizedBox(
@@ -343,7 +343,7 @@ class _FavouritesPageState extends State<FavouritesPage>
                         backgroundColor: Theme.of(context).primaryColor,
                         ),
                       onPressed: removeFoodFromFavourites,
-                      child: Text('Remove favourite',style: Theme.of(context).textTheme.bodyLarge)
+                      child: Text('Remove favourite',style: Theme.of(context).textTheme.bodyMedium)
                     )
                 )
               ],

@@ -28,22 +28,22 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: useDarkMode()?
-      ThemeData(
-        primaryColor: const Color.fromARGB(255, 235, 220, 255),
-        unselectedWidgetColor: const Color.fromARGB(255, 215, 190, 250),
-        highlightColor: Colors.deepPurple,
-        canvasColor: const Color.fromARGB(255, 190, 180, 230),
-        useMaterial3: true,
-        textTheme: TextTheme(
-          bodyLarge: TextStyle(color: Colors.black),
-          bodyMedium: TextStyle(color: Colors.black),
-        ),
-        snackBarTheme: SnackBarThemeData(
-          backgroundColor: const Color.fromARGB(255, 30, 25, 50),
-          elevation: 8
-        )
-      ):
+      theme: //useDarkMode()?
+      //ThemeData(
+      //  primaryColor: const Color.fromARGB(255, 235, 220, 255),
+      //  unselectedWidgetColor: const Color.fromARGB(255, 215, 190, 250),
+      //  highlightColor: Colors.deepPurple,
+      //  canvasColor: const Color.fromARGB(255, 190, 180, 230),
+      //  useMaterial3: true,
+      //  textTheme: TextTheme(
+      //    bodyLarge: TextStyle(color: Colors.black),
+      //    bodyMedium: TextStyle(color: Colors.black),
+      //  ),
+      //  snackBarTheme: SnackBarThemeData(
+      //    backgroundColor: const Color.fromARGB(255, 30, 25, 50),
+      //    elevation: 8
+      //  )
+      //):
       ThemeData(
         primaryColor: const Color.fromARGB(255, 50, 40, 80),
         unselectedWidgetColor: const Color.fromARGB(255, 100, 80, 150),
@@ -53,10 +53,10 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         textTheme: TextTheme(
           bodyLarge: TextStyle(color: Colors.white),
-          bodyMedium: TextStyle(color: Colors.white),
+          bodyMedium: TextStyle(color: Colors.white,fontSize: 12),
         ),
         snackBarTheme: SnackBarThemeData(
-          backgroundColor: const Color.fromARGB(255, 30, 25, 50),
+          backgroundColor: const Color.fromARGB(255, 100, 80, 150),
           elevation: 8
         )
       ),

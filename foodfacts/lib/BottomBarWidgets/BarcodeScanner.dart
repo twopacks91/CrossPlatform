@@ -1,3 +1,4 @@
+// ignore_for_file: prefer_const_constructors
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,9 @@ class Barcodescanner extends StatefulWidget{
 
 class _BarcodeScannerState extends State<Barcodescanner>
 {
-  bool _showFood = false;
+  bool _showFoodInfo = false;
+  bool _showError = false;
+  String _errorMessage = ":(";
   String _scannedBarcode = "";
   late Food _scannedFood;
   TextEditingController _weightEntryController = TextEditingController();
@@ -25,31 +28,55 @@ class _BarcodeScannerState extends State<Barcodescanner>
   Future<void> scanBarcode() async
   {
     String? result;
+    
     result = await SimpleBarcodeScanner.scanBarcode(
-      context,
-      scanFormat: ScanFormat.ONLY_BARCODE,
-      child: Center(child: Text("HI"),)
+    context,
+    scanFormat: ScanFormat.ONLY_BARCODE
     );
     if(result != null)
     {
       
       setState(() {
         _scannedBarcode = result!;
+        _showError = false;
       });
       await fetchFood();
     }
+    
+    
+  }
+
+  void showError(String message)
+  {
+    setState(() {
+      _showError = true;
+      _errorMessage = message;
+    });
+    
   }
 
   Future<void> fetchFood() async {
     final uri = Uri.parse('https://world.openfoodfacts.org/api/v2/product/$_scannedBarcode&json=true');
-    final resp = await http.get(uri);
+    final resp;
+    try{
+      resp = await http.get(uri);
+    }
+    catch(ex){
+      showError("You must be connected to the internet to use the barcode scanner");
+      return;
+    }
+    
     final jsondata = json.decode(resp.body);
-    print(jsondata);
-    //jsondata["product"]["nutriments"]["carbohydrates_value"]
-    final nutriments = jsondata["product"]["nutriments"];
-    final String? name = jsondata["product"]["product_name"];
-        final String? imageUrl = jsondata["product"]['image_url'];
-        final String? barcode = jsondata["product"]['code'];
+    final product = jsondata["product"];
+    if(product==null)
+    {
+      showError("Failed to find the product you were looking for :(");
+      return;
+    }
+    final nutriments = product["nutriments"];
+    final String? name = product["product_name"];
+        final String? imageUrl = product['image_url'];
+        final String? barcode = product['code'];
         
         
         final double? calories = (nutriments['energy_value'])?.toDouble();
@@ -70,8 +97,12 @@ class _BarcodeScannerState extends State<Barcodescanner>
         {
           setState(() {
             _scannedFood = Food(name, imageUrl, barcode, calories, carbs, protein, salt, fat);
-            _showFood = true;
+            _showFoodInfo = true;
           });
+        }
+        else
+        {
+          showError("The information on this product is too limited to display");
         }
 
   }
@@ -256,11 +287,8 @@ class _BarcodeScannerState extends State<Barcodescanner>
                     style: OutlinedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
-                    onPressed:()=>{ setState(() {
-                      _showFood = true;
-                      scanBarcode();
-                    })},
-                    child: Text('Back',style: Theme.of(context).textTheme.bodyLarge)
+                    onPressed: scanBarcode,
+                    child: Text('Rescan',style: Theme.of(context).textTheme.bodyMedium)
                   ),
                 ),
                 SizedBox(
@@ -271,7 +299,7 @@ class _BarcodeScannerState extends State<Barcodescanner>
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                     onPressed: addMealToDB,
-                    child: Text('Confirm selection',style: Theme.of(context).textTheme.bodyLarge)
+                    child: Text('Confirm meal',style: Theme.of(context).textTheme.bodyMedium)
                   ),
                 ),
                 SizedBox(
@@ -287,7 +315,7 @@ class _BarcodeScannerState extends State<Barcodescanner>
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                           onPressed: removeFoodFromFavourites,
-                          child: Text('Remove favourites',style: Theme.of(context).textTheme.bodyLarge)
+                          child: Text('Remove favourites',style: Theme.of(context).textTheme.bodyMedium)
                         )
                       :
                         OutlinedButton(
@@ -295,7 +323,7 @@ class _BarcodeScannerState extends State<Barcodescanner>
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                           onPressed: addFoodToFavourites,
-                          child: Text('Add to favourites',style: Theme.of(context).textTheme.bodyLarge)
+                          child: Text('Add to favourites',style: Theme.of(context).textTheme.bodyMedium)
                         )
                       );
                     }
@@ -306,7 +334,7 @@ class _BarcodeScannerState extends State<Barcodescanner>
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                           onPressed: (){ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Still talking with database, try again later"),duration: Duration(seconds: 2),));},
-                          child: Text('Add to favourites',style: Theme.of(context).textTheme.bodyLarge)
+                          child: Text('Add to favourites',style: Theme.of(context).textTheme.bodyMedium)
                         );
                     }
                   })
@@ -320,21 +348,62 @@ class _BarcodeScannerState extends State<Barcodescanner>
     );
   }
 
- 
 
-  Widget scanScreen()
+  Widget errorScreen()
   {
     return Center(
-      child: OutlinedButton(
-        child: Text("Scan"),
-        onPressed: scanBarcode,
+      child: Container(
+        padding: EdgeInsets.all(12),
+        width: 200,
+        height: 200,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(color: Theme.of(context).highlightColor),
+          color: Theme.of(context).primaryColor,
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(_errorMessage),
+              OutlinedButton(
+                child: Text("Retry scan",style: Theme.of(context).textTheme.bodyLarge,),
+                onPressed: scanBarcode,
+              )
+            ],
+          ),
+        ),
       )
-      );
+    );
+  }
+
+  Widget currentScreen(){
+    if(!_showFoodInfo && !_showError)
+    {
+      return SizedBox();
+    }
+    else if(_showFoodInfo && !_showError)
+    {
+      return foodInfoScreen();
+    }
+    else
+    {
+      return errorScreen();
+    }
+  }
+
+  @override
+  void initState(){
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((x){scanBarcode();});
   }
 
   @override
   Widget build(BuildContext context)
   {
-    return (_showFood?scanScreen():foodInfoScreen());
+    return Scaffold(
+      body: currentScreen()
+    );
+    
   }
 }
