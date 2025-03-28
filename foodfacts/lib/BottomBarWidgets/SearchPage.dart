@@ -288,8 +288,7 @@ class _SearchPageState extends State<SearchPage>
   }
 
 
-  void addMealToDB() async
-  {
+  void addMealToDB() async {
     int timeStamp = DateTime.now().millisecondsSinceEpoch;
     Food food = _foodList[_foodInfoIndex];
     food.timeAdded = timeStamp;
