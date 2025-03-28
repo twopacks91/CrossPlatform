@@ -236,6 +236,7 @@ class _SearchPageState extends State<SearchPage>
                   filled: true,
                   fillColor: Theme.of(context).primaryColor,
                   hintText: "Enter food name",
+                  hintStyle: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color),
                   border: OutlineInputBorder(),
                   focusColor: Theme.of(context).highlightColor,
                   suffixIconColor: Theme.of(context).highlightColor,
@@ -287,8 +288,7 @@ class _SearchPageState extends State<SearchPage>
   }
 
 
-  void addMealToDB() async
-  {
+  void addMealToDB() async {
     int timeStamp = DateTime.now().millisecondsSinceEpoch;
     Food food = _foodList[_foodInfoIndex];
     food.timeAdded = timeStamp;

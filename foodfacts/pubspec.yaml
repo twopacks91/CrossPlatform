@@ -41,6 +41,9 @@ dependencies:
   intl: ^0.20.2
   convex_bottom_bar: ^3.2.0
   shimmer: ^3.0.0
+  simple_barcode_scanner: ^0.3.0
+  shared_preferences: ^2.5.3
+
 
 
 

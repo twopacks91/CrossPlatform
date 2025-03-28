@@ -130,7 +130,7 @@ class _GoalsPageState extends State<GoalsPage>
         children: [
           Padding(padding: EdgeInsets.all(20)),
           GoalProgressCircle(
-                diameter: 300, 
+                diameter: 200, 
                 progress: carbsProgress,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
