@@ -2,6 +2,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import '../Food.dart';
 //import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget
@@ -23,7 +25,36 @@ class _SettingsPageState extends State<SettingsPage>
   final _saltGoalController = TextEditingController();
   final _fatGoalController = TextEditingController();
 
-  
+  List<Food> _meals = [];
+
+  void fetchMeals() async {
+    List<Food> newFoods = [];
+    await FirebaseFirestore.instance.collection("meals").get().then((collection){
+      for (dynamic doc in collection.docs){
+        
+        dynamic docData = doc.data();
+        int timeAdded = docData["timeAdded"];
+        String name = docData['name'];
+        String imageUrl = docData['imageUrl'];
+        String barcode = docData['barcode'];
+        double calories = docData["calories"]?.toDouble();
+        double carbs = docData["carbs"]?.toDouble();
+        double protein = docData["protein"]?.toDouble();
+        double salt = docData["salt"]?.toDouble();
+        double fat = docData["fat"]?.toDouble();
+        double weight = docData["weight"].toDouble();
+        Food newFood = Food(name, imageUrl, barcode, calories, carbs, protein, salt, fat);
+        newFood.timeAdded = timeAdded;
+        newFood.weight = weight;
+        newFoods.add(newFood);
+      }
+    });
+    // Sort meals by time added to database
+    newFoods.sort((a,b) => b.timeAdded!.compareTo(a.timeAdded!));
+    setState(() {
+      _meals = newFoods;
+    });
+  }
 
   Future<void> getGoals() async {
     dynamic doc = await FirebaseFirestore.instance.collection("settings").doc("goals").get();
@@ -85,6 +116,79 @@ class _SettingsPageState extends State<SettingsPage>
   {
     super.initState();
     getGoals();
+    fetchMeals();
+  }
+
+  String unixToTimeString(int unix)
+  {
+    DateTime dt =DateTime.fromMillisecondsSinceEpoch(unix).toLocal();
+    return DateFormat('HH:mm').format(dt);
+  }
+
+  void removeMeal(Food meal) async{
+    String docName = meal.barcode + meal.timeAdded.toString();
+    await FirebaseFirestore.instance.collection("meals").doc(docName).delete();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal removed"),duration: Duration(seconds: 2),));
+    fetchMeals();
+  }
+  
+  Widget mealHistoryTab(){
+    return Container(
+            decoration: BoxDecoration(
+              border: Border.all(),
+            ),
+            child: ExpansionTile(
+              childrenPadding: EdgeInsets.all(8),
+              title: Text("Meal history",style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color)),
+              children: [
+                Container(
+                  width: 420,
+                  height: 320,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    border: Border.all(color: Theme.of(context).highlightColor),
+                    color: Theme.of(context).primaryColor
+                  ),
+                  child:ListView.builder(
+                    itemCount: _meals.length,
+                    padding: EdgeInsets.all(0),
+                    itemBuilder: (context,index){
+                      return Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(),
+                          color: Theme.of(context).unselectedWidgetColor
+                        ),
+                        child: ExpansionTile(
+                          title: Text("${_meals[index].name} : ${_meals[index].weight.toString()}g",style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color),),
+                          childrenPadding: EdgeInsets.all(8),
+                          children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Time eaten: ${(_meals[index].timeAdded==null?"Time eaten not available":unixToTimeString(_meals[index].timeAdded!))}"),
+                                  Text("Calories  : ${_meals[index].calories.round()}kcal"),
+                                  Text("Carbs     : ${_meals[index].carbs.round()}g"),
+                                  Text("Protein   : ${_meals[index].protein.round()}g"),
+                                  Text("Salt      : ${_meals[index].salt.round()}g"),
+                                  Text("Fat       : ${_meals[index].fat.round()}g"),
+                                  SizedBox(height: 10,),
+                                  Center(
+                                    child: OutlinedButton(onPressed: ()=>{removeMeal(_meals[index])}, child: Text("Remove meal",style: Theme.of(context).textTheme.bodyLarge)),
+                                  )
+                                ],
+
+                            )
+                          ],
+                        )
+                      );
+
+
+                    }
+                  )
+                )
+              ],
+            )
+          );
   }
 
   Widget goalsTab()
@@ -230,7 +334,8 @@ class _SettingsPageState extends State<SettingsPage>
           SizedBox(height: 40),
           Text("Settings",style: TextStyle(fontSize: 40),),
           SizedBox(height: 10),
-          goalsTab()
+          goalsTab(),
+          mealHistoryTab()
         ],
       )
     );
