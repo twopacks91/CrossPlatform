@@ -23,6 +23,8 @@ class _SettingsPageState extends State<SettingsPage>
   final _saltGoalController = TextEditingController();
   final _fatGoalController = TextEditingController();
 
+  
+
   Future<void> getGoals() async {
     dynamic doc = await FirebaseFirestore.instance.collection("settings").doc("goals").get();
     Map<String,dynamic> docData = doc.data() as Map<String,dynamic>;

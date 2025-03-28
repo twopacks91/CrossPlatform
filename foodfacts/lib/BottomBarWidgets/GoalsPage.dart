@@ -149,7 +149,7 @@ class _GoalsPageState extends State<GoalsPage>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("${proteinTotal}g"),
+                    Text("${proteinTotal}g",style: Theme.of(context).textTheme.bodyLarge),
                     Text("Protein"),
                   ]
                 ),
@@ -160,7 +160,7 @@ class _GoalsPageState extends State<GoalsPage>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("${saltTotal}g"),
+                    Text("${saltTotal}g",style: Theme.of(context).textTheme.bodyLarge),
                     Text("Salt"),
                   ]
                 ),
@@ -171,7 +171,7 @@ class _GoalsPageState extends State<GoalsPage>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("${fatTotal}g"),
+                    Text("${fatTotal}g",style: Theme.of(context).textTheme.bodyLarge),
                     Text("Fat"),
                   ]
                 ),
@@ -217,7 +217,7 @@ class _GoalsPageState extends State<GoalsPage>
                             Text("Fat       : ${_meals[index].fat}g"),
                             SizedBox(height: 10,),
                             Center(
-                              child: OutlinedButton(onPressed: ()=>{removeMeal(_meals[index])}, child: Text("Remove meal")),
+                              child: OutlinedButton(onPressed: ()=>{removeMeal(_meals[index])}, child: Text("Remove meal",style: Theme.of(context).textTheme.bodyLarge)),
                             )
                           ],
                         

@@ -22,22 +22,29 @@ void main() async{
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  
+  Future useDarkMode() async{
+    return false;
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      //theme: ThemeData(
-      //  primaryColor: const Color.fromARGB(255, 235, 220, 255),
-      //  unselectedWidgetColor: const Color.fromARGB(255, 215, 190, 250),
-      //  highlightColor: Colors.deepPurple,
-      //  canvasColor: const Color.fromARGB(255, 190, 180, 230),
-      //  useMaterial3: true,
-      //  textTheme: TextTheme(
-      //    bodyLarge: TextStyle(color: Colors.black),
-      //    bodyMedium: TextStyle(color: Colors.black),
-      //  )
-      //),
-      theme: ThemeData(
+      theme: useDarkMode()?
+      ThemeData(
+        primaryColor: const Color.fromARGB(255, 235, 220, 255),
+        unselectedWidgetColor: const Color.fromARGB(255, 215, 190, 250),
+        highlightColor: Colors.deepPurple,
+        canvasColor: const Color.fromARGB(255, 190, 180, 230),
+        useMaterial3: true,
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(color: Colors.black),
+          bodyMedium: TextStyle(color: Colors.black),
+        ),
+        snackBarTheme: SnackBarThemeData(
+          backgroundColor: const Color.fromARGB(255, 30, 25, 50),
+          elevation: 8
+        )
+      ):
+      ThemeData(
         primaryColor: const Color.fromARGB(255, 50, 40, 80),
         unselectedWidgetColor: const Color.fromARGB(255, 100, 80, 150),
         highlightColor: Colors.deepPurpleAccent,
@@ -47,6 +54,10 @@ class MyApp extends StatelessWidget {
         textTheme: TextTheme(
           bodyLarge: TextStyle(color: Colors.white),
           bodyMedium: TextStyle(color: Colors.white),
+        ),
+        snackBarTheme: SnackBarThemeData(
+          backgroundColor: const Color.fromARGB(255, 30, 25, 50),
+          elevation: 8
         )
       ),
       home: const BottomNavBar(),
