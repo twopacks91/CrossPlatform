@@ -18,8 +18,16 @@ void main() async{
   runApp(const MyApp());
 }
 
+// Whole app rebuild for theme changing
+// Modified code from this website
+// https://hillel.dev/2018/08/15/flutter-how-to-rebuild-the-entire-app-to-change-the-theme-or-locale/
+
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  static _MyAppState of(BuildContext context){
+    return context.findAncestorStateOfType<_MyAppState>()!;
+  }
 
   @override
   State<MyApp> createState()=> _MyAppState(); 
@@ -27,6 +35,12 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp>{
   bool _useDarkMode = false;
+
+  // Rebuild the entire app widget tree 
+  void rebuild(){
+    setDarkMode();
+    setState(() {});
+  }
 
   Future<void> setDarkMode() async {
     final bool dm = await DatabaseManager.isDarkMode();
@@ -91,7 +105,6 @@ class BottomNavBar extends StatefulWidget {
 
 class _BottomBarNavState extends State<BottomNavBar> {
 
-  
   int _selectedIndex = 0;
 
   static const List<Widget> _pages = <Widget>[

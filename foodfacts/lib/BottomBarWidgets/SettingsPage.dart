@@ -329,10 +329,7 @@ class _SettingsPageState extends State<SettingsPage>
     else{
       await DatabaseManager.setDarkMode(true);
     }
-    setState(() {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please restart app to change theme to ${(isDarkMode?"light":"dark")}")));
-    });
-    
+    MyApp.of(context).rebuild();
   }
 
   Widget customizationTab(){
