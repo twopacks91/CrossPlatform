@@ -8,6 +8,7 @@ import 'BottomBarWidgets/BarcodeScanner.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'DatabaseManager.dart';
 
 
 
@@ -17,33 +18,48 @@ void main() async{
   runApp(const MyApp());
 }
 
-
-
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  Future useDarkMode() async{
-    return false;
+  @override
+  State<MyApp> createState()=> _MyAppState(); 
+}
+
+class _MyAppState extends State<MyApp>{
+  bool _useDarkMode = false;
+
+  Future<void> setDarkMode() async {
+    final bool dm = await DatabaseManager.isDarkMode();
+    setState(() {
+      _useDarkMode = dm;
+    });
   }
+
+  @override
+  void initState() {
+    super.initState();
+    setDarkMode();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: //useDarkMode()?
-      //ThemeData(
-      //  primaryColor: const Color.fromARGB(255, 235, 220, 255),
-      //  unselectedWidgetColor: const Color.fromARGB(255, 215, 190, 250),
-      //  highlightColor: Colors.deepPurple,
-      //  canvasColor: const Color.fromARGB(255, 190, 180, 230),
-      //  useMaterial3: true,
-      //  textTheme: TextTheme(
-      //    bodyLarge: TextStyle(color: Colors.black),
-      //    bodyMedium: TextStyle(color: Colors.black),
-      //  ),
-      //  snackBarTheme: SnackBarThemeData(
-      //    backgroundColor: const Color.fromARGB(255, 30, 25, 50),
-      //    elevation: 8
-      //  )
-      //):
+      return MaterialApp(
+      theme: (!_useDarkMode?
+      ThemeData(
+        primaryColor: const Color.fromARGB(255, 235, 220, 255),
+        unselectedWidgetColor: const Color.fromARGB(255, 235, 220, 255),
+        highlightColor: Colors.deepPurple,
+        canvasColor: const Color.fromARGB(255, 190, 180, 230),
+        useMaterial3: true,
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(color: Colors.black),
+          bodyMedium: TextStyle(color: Colors.black),
+        ),
+        snackBarTheme: SnackBarThemeData(
+          backgroundColor: const Color.fromARGB(255, 30, 25, 50),
+          elevation: 25
+        )
+      ):
       ThemeData(
         primaryColor: const Color.fromARGB(255, 50, 40, 80),
         unselectedWidgetColor: const Color.fromARGB(255, 100, 80, 150),
@@ -57,12 +73,12 @@ class MyApp extends StatelessWidget {
         ),
         snackBarTheme: SnackBarThemeData(
           backgroundColor: const Color.fromARGB(255, 100, 80, 150),
-          elevation: 8
+          elevation: 25
         )
-      ),
+      )),
       home: const BottomNavBar(),
     );
-  }
+    }
 }
 
 // https://api.flutter.dev/flutter/material/BottomNavigationBar-class.html
@@ -75,6 +91,7 @@ class BottomNavBar extends StatefulWidget {
 
 class _BottomBarNavState extends State<BottomNavBar> {
 
+  
   int _selectedIndex = 0;
 
   static const List<Widget> _pages = <Widget>[
@@ -90,11 +107,11 @@ class _BottomBarNavState extends State<BottomNavBar> {
       _selectedIndex = index;
     });
   }
-
+  
   final Color _selectedIconColour = const Color.fromARGB(255, 71, 74, 255);
   final Color _inactiveIconColour = const Color.fromARGB(255, 116, 116, 116);
   final Color _backgroundColour = const Color.fromARGB(192, 235, 221, 255);
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -135,8 +152,6 @@ class _BottomBarNavState extends State<BottomNavBar> {
     );
   }
 }
-
-
 
 
 

@@ -2,6 +2,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:foodfacts/DatabaseManager.dart';
+import 'package:foodfacts/main.dart';
 import 'package:intl/intl.dart';
 import '../Food.dart';
 //import 'package:shared_preferences/shared_preferences.dart';
@@ -56,73 +58,10 @@ class _SettingsPageState extends State<SettingsPage>
     });
   }
 
-  Future<void> getGoals() async {
-    dynamic doc = await FirebaseFirestore.instance.collection("settings").doc("goals").get();
-    Map<String,dynamic> docData = doc.data() as Map<String,dynamic>;
-    int carbs = docData["carbsgoal"];
-    int protein = docData["proteingoal"];
-    int salt = docData["saltgoal"];
-    int fat = docData["fatgoal"];
-    setState(() {
-      _carbsGoalController.text = carbs.toString();
-      _proteinGoalController.text = protein.toString();
-      _saltGoalController.text = salt.toString();
-      _fatGoalController.text = fat.toString();
-    });
-  }
-
-  Future<void> setCarbsGoal() async {
-    if(int.tryParse(_carbsGoalController.text)==null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the carbs goal textbox"),duration: Duration(seconds: 2)));
-    }
-    else {
-      await FirebaseFirestore.instance.collection("settings").doc("goals").update({ "carbsgoal" : int.parse(_carbsGoalController.text) });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Carbohydrate goal updated"),duration: Duration(seconds: 2)));
-    }
-  }
-
-  Future<void> setProteinGoal() async {
-    if(int.tryParse(_proteinGoalController.text)==null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the protein goal textbox"),duration: Duration(seconds: 2)));
-    }
-    else {
-      await FirebaseFirestore.instance.collection("settings").doc("goals").update({ "proteingoal" : int.parse(_proteinGoalController.text) });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Protein goal updated"),duration: Duration(seconds: 2)));
-    }
-  }
-
-  Future<void> setSaltGoal() async {
-    if(int.tryParse(_saltGoalController.text)==null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the salt goal textbox"),duration: Duration(seconds: 2)));
-    }
-    else {
-      await FirebaseFirestore.instance.collection("settings").doc("goals").update({ "saltgoal" : int.parse(_saltGoalController.text) });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Salt goal updated"),duration: Duration(seconds: 2)));
-    }
-  }
-
-  Future<void> setFatGoal() async {
-    if(int.tryParse(_fatGoalController.text)==null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the fat goal textbox"),duration: Duration(seconds: 2)));
-    }
-    else {
-      await FirebaseFirestore.instance.collection("settings").doc("goals").update({ "fatgoal" : int.parse(_fatGoalController.text) });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Carbohydrate goal updated"),duration: Duration(seconds: 2)));
-    }
-  }
-
-  @override
-  void initState()
-  {
-    super.initState();
-    getGoals();
-    fetchMeals();
-  }
-
   String unixToTimeString(int unix)
   {
     DateTime dt =DateTime.fromMillisecondsSinceEpoch(unix).toLocal();
-    return DateFormat('HH:mm').format(dt);
+    return DateFormat('HH:mm dd/mm/yyyy').format(dt);
   }
 
   void removeMeal(Food meal) async{
@@ -190,6 +129,64 @@ class _SettingsPageState extends State<SettingsPage>
             )
           );
   }
+
+  Future<void> getGoals() async {
+    dynamic doc = await FirebaseFirestore.instance.collection("settings").doc("goals").get();
+    Map<String,dynamic> docData = doc.data() as Map<String,dynamic>;
+    int carbs = docData["carbsgoal"];
+    int protein = docData["proteingoal"];
+    int salt = docData["saltgoal"];
+    int fat = docData["fatgoal"];
+    setState(() {
+      _carbsGoalController.text = carbs.toString();
+      _proteinGoalController.text = protein.toString();
+      _saltGoalController.text = salt.toString();
+      _fatGoalController.text = fat.toString();
+    });
+  }
+
+  
+
+  Future<void> setCarbsGoal() async {
+    if(int.tryParse(_carbsGoalController.text)==null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the carbs goal textbox"),duration: Duration(seconds: 2)));
+    }
+    else {
+      await FirebaseFirestore.instance.collection("settings").doc("goals").update({ "carbsgoal" : int.parse(_carbsGoalController.text) });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Carbohydrate goal updated"),duration: Duration(seconds: 2)));
+    }
+  }
+
+  Future<void> setProteinGoal() async {
+    if(int.tryParse(_proteinGoalController.text)==null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the protein goal textbox"),duration: Duration(seconds: 2)));
+    }
+    else {
+      await FirebaseFirestore.instance.collection("settings").doc("goals").update({ "proteingoal" : int.parse(_proteinGoalController.text) });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Protein goal updated"),duration: Duration(seconds: 2)));
+    }
+  }
+
+  Future<void> setSaltGoal() async {
+    if(int.tryParse(_saltGoalController.text)==null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the salt goal textbox"),duration: Duration(seconds: 2)));
+    }
+    else {
+      await FirebaseFirestore.instance.collection("settings").doc("goals").update({ "saltgoal" : int.parse(_saltGoalController.text) });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Salt goal updated"),duration: Duration(seconds: 2)));
+    }
+  }
+
+  Future<void> setFatGoal() async {
+    if(int.tryParse(_fatGoalController.text)==null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the fat goal textbox"),duration: Duration(seconds: 2)));
+    }
+    else {
+      await FirebaseFirestore.instance.collection("settings").doc("goals").update({ "fatgoal" : int.parse(_fatGoalController.text) });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Fat goal updated"),duration: Duration(seconds: 2)));
+    }
+  }
+
 
   Widget goalsTab()
   {
@@ -323,6 +320,69 @@ class _SettingsPageState extends State<SettingsPage>
             )
           );
   }
+  
+  void toggleDarkMode() async {
+    final bool isDarkMode = await DatabaseManager.isDarkMode();
+    if(isDarkMode){
+      await DatabaseManager.setDarkMode(false);
+    }
+    else{
+      await DatabaseManager.setDarkMode(true);
+    }
+    setState(() {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please restart app to change theme to ${(isDarkMode?"light":"dark")}")));
+    });
+    
+  }
+
+  Widget customizationTab(){
+    return Container(
+            decoration: BoxDecoration(
+              border: Border.all(),
+            ),
+            child: ExpansionTile(
+              childrenPadding: EdgeInsets.all(8),
+              title: Text("Customization",style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color)),
+              children: [
+                Row(
+                  children: [
+                    Text("Use dark mode:"),
+                    IconButton(onPressed: toggleDarkMode, icon:
+                      FutureBuilder(
+                        future: DatabaseManager.isDarkMode(), 
+                        builder: (context,snapshot){
+                          if(snapshot.connectionState==ConnectionState.waiting){
+                            return Icon(Icons.refresh);
+                          }
+                          else if(snapshot.connectionState==ConnectionState.done){
+                            if(snapshot.data==true){
+                              return Icon(Icons.toggle_on);
+                            }
+                            else{
+                              return Icon(Icons.toggle_off_outlined);
+                            }
+                          }
+                          else{
+                            return Icon(Icons.error);
+                          }
+                          
+                        }
+                      )
+                    )
+                     //IconButton(onPressed: toggleDarkMode, icon: Icon((()?Icons.toggle_on:Icons.toggle_off_outlined)))
+                  ],
+                )
+              ],
+            )
+          );
+  }
+  @override
+  void initState()
+  {
+    super.initState();
+    getGoals();
+    fetchMeals();
+  }
 
   @override
   Widget build(BuildContext context) 
@@ -340,7 +400,8 @@ class _SettingsPageState extends State<SettingsPage>
               child: Column(
                 children: [
                   goalsTab(),
-                  mealHistoryTab()
+                  mealHistoryTab(),
+                  customizationTab()
                 ]
               )
             )
