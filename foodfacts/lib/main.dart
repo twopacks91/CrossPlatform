@@ -25,6 +25,7 @@ void main() async{
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  
   static _MyAppState of(BuildContext context){
     return context.findAncestorStateOfType<_MyAppState>()!;
   }
@@ -38,11 +39,11 @@ class _MyAppState extends State<MyApp>{
 
   // Rebuild the entire app widget tree 
   void rebuild(){
-    setDarkMode();
+    _getDarkMode();
     setState(() {});
   }
 
-  Future<void> setDarkMode() async {
+  Future<void> _getDarkMode() async {
     final bool dm = await DatabaseManager.isDarkMode();
     setState(() {
       _useDarkMode = dm;
@@ -52,44 +53,46 @@ class _MyAppState extends State<MyApp>{
   @override
   void initState() {
     super.initState();
-    setDarkMode();
+    _getDarkMode();
   }
 
-  @override
-  Widget build(BuildContext context) {
-      return MaterialApp(
-      theme: (!_useDarkMode?
-      ThemeData(
-        primaryColor: const Color.fromARGB(255, 235, 220, 255),
-        unselectedWidgetColor: const Color.fromARGB(255, 235, 220, 255),
-        highlightColor: Colors.deepPurple,
-        canvasColor: const Color.fromARGB(255, 190, 180, 230),
-        useMaterial3: true,
-        textTheme: TextTheme(
-          bodyLarge: TextStyle(color: Colors.black),
-          bodyMedium: TextStyle(color: Colors.black),
-        ),
-        snackBarTheme: SnackBarThemeData(
-          backgroundColor: const Color.fromARGB(255, 30, 25, 50),
-          elevation: 25
-        )
-      ):
-      ThemeData(
+  ThemeData darkTheme = ThemeData(
         primaryColor: const Color.fromARGB(255, 50, 40, 80),
         unselectedWidgetColor: const Color.fromARGB(255, 100, 80, 150),
         highlightColor: Colors.deepPurpleAccent,
         canvasColor: const Color.fromARGB(255, 30, 25, 50),
         scaffoldBackgroundColor: const Color.fromARGB(255, 20, 18, 40),
         useMaterial3: true,
-        textTheme: TextTheme(
+        textTheme: const TextTheme(
           bodyLarge: TextStyle(color: Colors.white),
           bodyMedium: TextStyle(color: Colors.white,fontSize: 12),
         ),
-        snackBarTheme: SnackBarThemeData(
-          backgroundColor: const Color.fromARGB(255, 100, 80, 150),
-          elevation: 25
+        snackBarTheme: const SnackBarThemeData(
+          backgroundColor: Color.fromARGB(255, 100, 80, 150),
+          elevation: 8
         )
-      )),
+      );
+
+  ThemeData lightTheme = ThemeData(
+        primaryColor: const Color.fromARGB(255, 235, 220, 255),
+        unselectedWidgetColor: const Color.fromARGB(255, 235, 220, 255),
+        highlightColor: Colors.deepPurple,
+        canvasColor: const Color.fromARGB(255, 190, 180, 230),
+        useMaterial3: true,
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(color: Colors.black),
+          bodyMedium: TextStyle(color: Colors.black,fontSize: 12),
+        ),
+        snackBarTheme: const SnackBarThemeData(
+          backgroundColor: Color.fromARGB(255, 30, 25, 50),
+          elevation: 8
+        )
+      );
+
+  @override
+  Widget build(BuildContext context) {
+      return MaterialApp(
+      theme: (_useDarkMode?darkTheme:lightTheme),
       home: const BottomNavBar(),
     );
     }
@@ -121,12 +124,24 @@ class _BottomBarNavState extends State<BottomNavBar> {
     });
   }
   
-  final Color _selectedIconColour = const Color.fromARGB(255, 71, 74, 255);
-  final Color _inactiveIconColour = const Color.fromARGB(255, 116, 116, 116);
-  final Color _backgroundColour = const Color.fromARGB(192, 235, 221, 255);
+  Color _selectedIconColour = const Color.fromARGB(255, 71, 74, 255);
+  Color _inactiveIconColour = const Color.fromARGB(255, 116, 116, 116);
+  Color _backgroundColour = const Color.fromARGB(192, 235, 221, 255);
+
+  //Color _selectedIconColour;
+  //Color _inactiveIconColour;
+  //Color _backgroundColour;
+
+  void setColors(){
+    _backgroundColour = Theme.of(context).unselectedWidgetColor;
+    _inactiveIconColour = Theme.of(context).textTheme.bodyLarge!.color!.withAlpha(150);
+    _selectedIconColour = Theme.of(context).highlightColor.withGreen(150);
+  }
+  
   
   @override
   Widget build(BuildContext context) {
+    setColors();
     return Scaffold(
       body: Center(
         child: _pages.elementAt(_selectedIndex),
@@ -147,7 +162,7 @@ class _BottomBarNavState extends State<BottomNavBar> {
               title: 'Search'
             ),
             TabItem(
-              icon: Icons.qr_code_scanner, 
+              icon: Icons.qr_code_scanner_rounded, 
               title: 'Scan'
             ),
             TabItem(

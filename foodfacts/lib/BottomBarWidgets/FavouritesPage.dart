@@ -4,7 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:foodfacts/Food.dart';
-
+import 'package:shimmer/shimmer.dart';
+import 'package:http/http.dart' as http;
 
 class FavouritesPage extends StatefulWidget
 {
@@ -16,7 +17,7 @@ class FavouritesPage extends StatefulWidget
 
 class _FavouritesPageState extends State<FavouritesPage>
 {
-  bool _hasNoFavourites = false;
+  bool _hasNoFavourites = true;
   List<Food> _foodList = [];
   TextEditingController _weightEntryController = TextEditingController();
   String query = 'jaffa cake';
@@ -107,11 +108,7 @@ class _FavouritesPageState extends State<FavouritesPage>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.network(
-                    _foodList[index].imageUrl,
-                    height: 150,
-                    fit: BoxFit.fill,
-                  ),
+                  internetImage(_foodList[index].imageUrl, 150),
                   const SizedBox(height: 10),
                   Text(
                     _foodList[index].name,
@@ -125,38 +122,81 @@ class _FavouritesPageState extends State<FavouritesPage>
       );
   }
 
+  Image internetImage(String url, double height){
+    Image im;
+    try{
+      im = Image.network(
+        url,
+        height: height,
+        fit: BoxFit.fill,
+      );
+    }
+    catch(ex){
+      im = Image(
+        image: AssetImage('assets/nointernet.png'),
+        height: height,
+        fit: BoxFit.fill,
+      );
+    }
+    return im;
+  }
+
   Scaffold foodList()
   {
     return Scaffold(
       backgroundColor: Theme.of(context).canvasColor,
-      body: (_hasNoFavourites? 
-        // If user has no favourited foods, tell them
-        Center(
-          child:Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            children: const [
-              Text("You have no favourited foods",textAlign: TextAlign.center),
-              Text("Try adding some from the search page",textAlign: TextAlign.center),
-            ],
-          )
-        )
-        :
-        // Else display their favourites
-        Column(
+      body: Column(
           children: [
             Padding(
               padding: 
                 EdgeInsets.all(12),
               ),
-              Expanded(child: itemViewer(),
+              Expanded(child: FutureBuilder(future: isConnectedToInternet(), builder: (context,snapshot){
+
+                if(snapshot.connectionState == ConnectionState.done){
+                  if(snapshot.data==true){
+                    if(_hasNoFavourites){
+                      return Center(
+                        child:Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.max,
+                          children: const [
+                            Text("You have no favourited foods",textAlign: TextAlign.center),
+                            Text("Try adding some from the search page",textAlign: TextAlign.center),
+                          ],
+                        )
+                      );
+                    }
+                    else{
+                      return itemViewer();
+                    }
+                  }
+                  else{
+                    return connectionIssue();
+                  }
+                }
+                else{
+                  return foodGridSkeleton();
+                }
+                
+              }),
             ),
           ],
         )
-      )
     );
   }
 
+  Future<bool> isConnectedToInternet() async{
+    try{
+      dynamic resp = await http.get(Uri.parse("https://example.com/api/fetch?limit=10,20,30&max=100"));
+      return true;
+    }
+    catch(ex){
+      return false;
+    }
+    
+  }
+  
   void decreaseWeight()
   {
     if(_weightEntryController.text=="")
@@ -225,6 +265,34 @@ class _FavouritesPageState extends State<FavouritesPage>
     });
   }
 
+  // Used when waiting for API to return meaningful data
+  GridView foodGridSkeleton(){
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.7,
+        crossAxisSpacing: 8.0,
+        mainAxisSpacing: 8.0,
+      ), 
+      padding: EdgeInsets.all(8),
+      itemCount: 6,
+      itemBuilder: (context,index) {
+        return Shimmer.fromColors(
+          baseColor: Theme.of(context).primaryColor, 
+          highlightColor: Theme.of(context).unselectedWidgetColor,
+          child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                  color: Theme.of(context).primaryColor,
+                  border: Border.all(color: Theme.of(context).highlightColor)
+                ),
+              ),
+        );
+      }
+    );
+  }
+
   Scaffold foodInfo()
   {
     return Scaffold(
@@ -237,9 +305,9 @@ class _FavouritesPageState extends State<FavouritesPage>
             SizedBox(height: 20,),
             SizedBox(
               height: 200,
-              child: Image.network(
+              child: internetImage(
                 _foodList[_foodInfoIndex].imageUrl,
-                fit: BoxFit.fill,
+                200,
               )
             ),
             Expanded(child: SizedBox(),),
@@ -364,7 +432,30 @@ class _FavouritesPageState extends State<FavouritesPage>
 
   @override
   Widget build(BuildContext context) {
-    
     return (_showFoodInfo? foodInfo():foodList());
+  }
+  
+  Widget connectionIssue()
+  {
+    return Center(
+      child: Container(
+        padding: EdgeInsets.all(12),
+        width: 200,
+        height: 200,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(color: Theme.of(context).highlightColor),
+          color: Theme.of(context).primaryColor,
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: const [
+              Text("You need to be connected to the internet to use the favourites feature"),
+            ],
+          ),
+        ),
+      )
+    );
   }
 }

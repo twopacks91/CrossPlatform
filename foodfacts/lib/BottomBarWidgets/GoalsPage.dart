@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:foodfacts/DatabaseManager.dart';
 import 'package:foodfacts/Food.dart';
 import 'package:intl/intl.dart';
 import '../MyWidgets/GoalProgressCircle.dart';
@@ -16,7 +17,6 @@ class GoalsPage extends StatefulWidget
 
 class _GoalsPageState extends State<GoalsPage>
 {
-  // Read these from database
   int carbsGoal = 100;
   int proteinGoal = 100;
   int saltGoal = 100;
@@ -92,12 +92,10 @@ class _GoalsPageState extends State<GoalsPage>
   }
 
   Future<void> updateGoals() async {
-    dynamic doc = await FirebaseFirestore.instance.collection("settings").doc("goals").get();
-    Map<String,dynamic> docData = doc.data() as Map<String,dynamic>;
-    int carbs = docData["carbsgoal"];
-    int protein = docData["proteingoal"];
-    int salt = docData["saltgoal"];
-    int fat = docData["fatgoal"];
+    int carbs = await DatabaseManager.getCarbsGoal();
+    int protein = await DatabaseManager.getProteinGoal();
+    int salt = await DatabaseManager.getSaltGoal();
+    int fat = await DatabaseManager.getFatGoal();
     setState(() {
       carbsGoal = carbs;
       proteinGoal = protein;
@@ -128,7 +126,6 @@ class _GoalsPageState extends State<GoalsPage>
     return Scaffold(
       backgroundColor: Theme.of(context).canvasColor,
       body: Column(
-        
         children: [
           Padding(padding: EdgeInsets.all(20)),
           GoalProgressCircle(
@@ -192,7 +189,9 @@ class _GoalsPageState extends State<GoalsPage>
             ),
             child: ( _meals.isEmpty ? 
             // If there are no meals tell the user
-            Text("No meals listed for today",textAlign: TextAlign.center,) 
+            Center(
+              child: Text("No meals listed for today",textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyLarge,)  
+            )
             : 
             // Else display meal list
             ListView.builder(

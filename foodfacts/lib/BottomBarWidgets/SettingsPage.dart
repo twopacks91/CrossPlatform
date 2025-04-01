@@ -6,6 +6,7 @@ import 'package:foodfacts/DatabaseManager.dart';
 import 'package:foodfacts/main.dart';
 import 'package:intl/intl.dart';
 import '../Food.dart';
+import 'package:http/http.dart' as http;
 //import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget
@@ -70,6 +71,17 @@ class _SettingsPageState extends State<SettingsPage>
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal removed"),duration: Duration(seconds: 2),));
     fetchMeals();
   }
+
+  Future<bool> isConnectedToInternet() async{
+    try{
+      dynamic resp = await http.get(Uri.parse("https://example.com/api/fetch?limit=10,20,30&max=100"));
+      return true;
+    }
+    catch(ex){
+      return false;
+    }
+    
+  }
   
   Widget mealHistoryTab(){
     return Container(
@@ -131,12 +143,10 @@ class _SettingsPageState extends State<SettingsPage>
   }
 
   Future<void> getGoals() async {
-    dynamic doc = await FirebaseFirestore.instance.collection("settings").doc("goals").get();
-    Map<String,dynamic> docData = doc.data() as Map<String,dynamic>;
-    int carbs = docData["carbsgoal"];
-    int protein = docData["proteingoal"];
-    int salt = docData["saltgoal"];
-    int fat = docData["fatgoal"];
+    int carbs = await DatabaseManager.getCarbsGoal();
+    int protein = await DatabaseManager.getProteinGoal();
+    int salt = await DatabaseManager.getSaltGoal();
+    int fat = await DatabaseManager.getFatGoal();
     setState(() {
       _carbsGoalController.text = carbs.toString();
       _proteinGoalController.text = protein.toString();
@@ -152,7 +162,7 @@ class _SettingsPageState extends State<SettingsPage>
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the carbs goal textbox"),duration: Duration(seconds: 2)));
     }
     else {
-      await FirebaseFirestore.instance.collection("settings").doc("goals").update({ "carbsgoal" : int.parse(_carbsGoalController.text) });
+      await DatabaseManager.setCarbsGoal(int.parse(_carbsGoalController.text));
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Carbohydrate goal updated"),duration: Duration(seconds: 2)));
     }
   }
@@ -162,7 +172,7 @@ class _SettingsPageState extends State<SettingsPage>
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the protein goal textbox"),duration: Duration(seconds: 2)));
     }
     else {
-      await FirebaseFirestore.instance.collection("settings").doc("goals").update({ "proteingoal" : int.parse(_proteinGoalController.text) });
+      await DatabaseManager.setProteinGoal(int.parse(_proteinGoalController.text));
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Protein goal updated"),duration: Duration(seconds: 2)));
     }
   }
@@ -172,7 +182,7 @@ class _SettingsPageState extends State<SettingsPage>
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the salt goal textbox"),duration: Duration(seconds: 2)));
     }
     else {
-      await FirebaseFirestore.instance.collection("settings").doc("goals").update({ "saltgoal" : int.parse(_saltGoalController.text) });
+      await DatabaseManager.setSaltGoal(int.parse(_saltGoalController.text));
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Salt goal updated"),duration: Duration(seconds: 2)));
     }
   }
@@ -182,7 +192,7 @@ class _SettingsPageState extends State<SettingsPage>
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the fat goal textbox"),duration: Duration(seconds: 2)));
     }
     else {
-      await FirebaseFirestore.instance.collection("settings").doc("goals").update({ "fatgoal" : int.parse(_fatGoalController.text) });
+      await DatabaseManager.setFatGoal(int.parse(_fatGoalController.text));
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Fat goal updated"),duration: Duration(seconds: 2)));
     }
   }
@@ -329,6 +339,8 @@ class _SettingsPageState extends State<SettingsPage>
     else{
       await DatabaseManager.setDarkMode(true);
     }
+    // Calls setstate from highest point in the widget tree so rebuild whole app
+    // Hence changing the theme
     MyApp.of(context).rebuild();
   }
 
