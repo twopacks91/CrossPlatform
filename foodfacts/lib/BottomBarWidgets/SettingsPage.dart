@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:foodfacts/DatabaseManager.dart';
 import 'package:foodfacts/main.dart';
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 import '../Food.dart';
 import 'package:http/http.dart' as http;
 //import 'package:shared_preferences/shared_preferences.dart';
@@ -68,7 +69,7 @@ class _SettingsPageState extends State<SettingsPage>
   void removeMeal(Food meal) async{
     String docName = meal.barcode + meal.timeAdded.toString();
     await FirebaseFirestore.instance.collection("meals").doc(docName).delete();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal removed"),duration: Duration(seconds: 2),));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal removed",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2),));
     fetchMeals();
   }
 
@@ -82,64 +83,87 @@ class _SettingsPageState extends State<SettingsPage>
     }
     
   }
+
+  Widget mealsList(){
+    return ListView.builder(
+      itemCount: _meals.length,
+      padding: EdgeInsets.all(0),
+      itemBuilder: (context,index){
+        return Container(
+          decoration: BoxDecoration(
+            border: Border.all(),
+            color: Theme.of(context).unselectedWidgetColor
+          ),
+          child: ExpansionTile(
+            title: Text("${_meals[index].name} : ${_meals[index].weight.toString()}g",style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color),),
+            childrenPadding: EdgeInsets.all(8),
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Time eaten: ${(_meals[index].timeAdded==null?"Time eaten not available":unixToTimeString(_meals[index].timeAdded!))}"),
+                  Text("Calories  : ${_meals[index].calories.round()}kcal"),
+                  Text("Carbs     : ${_meals[index].carbs.round()}g"),
+                  Text("Protein   : ${_meals[index].protein.round()}g"),
+                  Text("Salt      : ${_meals[index].salt.round()}g"),
+                  Text("Fat       : ${_meals[index].fat.round()}g"),
+                  SizedBox(height: 10,),
+                  Center(
+                    child: OutlinedButton(
+                      onPressed: ()=>{removeMeal(_meals[index])}, 
+                      child: Text("Remove meal",style: Theme.of(context).textTheme.bodyLarge)
+                    ),
+                  )
+                ]
+              )
+            ],
+          )
+        );
+      }
+    );
+  }
   
   Widget mealHistoryTab(){
     return Container(
+      decoration: BoxDecoration(
+      border: Border.all(color: Theme.of(context).highlightColor),
+        color: Theme.of(context).primaryColor,
+      ),
+      child: ExpansionTile(
+        childrenPadding: EdgeInsets.all(8),
+        title: Text("Meal history",style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color)),
+        children: [
+          Container(
+            width: 420,
+            height: 320,
             decoration: BoxDecoration(
-              border: Border.all(),
+              borderRadius: BorderRadius.all(Radius.circular(8)),
+              border: Border.all(color: Theme.of(context).highlightColor),
+              color: Theme.of(context).primaryColor
             ),
-            child: ExpansionTile(
-              childrenPadding: EdgeInsets.all(8),
-              title: Text("Meal history",style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color)),
-              children: [
-                Container(
-                  width: 420,
-                  height: 320,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    border: Border.all(color: Theme.of(context).highlightColor),
-                    color: Theme.of(context).primaryColor
-                  ),
-                  child:ListView.builder(
-                    itemCount: _meals.length,
-                    padding: EdgeInsets.all(0),
-                    itemBuilder: (context,index){
-                      return Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(),
-                          color: Theme.of(context).unselectedWidgetColor
-                        ),
-                        child: ExpansionTile(
-                          title: Text("${_meals[index].name} : ${_meals[index].weight.toString()}g",style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color),),
-                          childrenPadding: EdgeInsets.all(8),
-                          children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Time eaten: ${(_meals[index].timeAdded==null?"Time eaten not available":unixToTimeString(_meals[index].timeAdded!))}"),
-                                  Text("Calories  : ${_meals[index].calories.round()}kcal"),
-                                  Text("Carbs     : ${_meals[index].carbs.round()}g"),
-                                  Text("Protein   : ${_meals[index].protein.round()}g"),
-                                  Text("Salt      : ${_meals[index].salt.round()}g"),
-                                  Text("Fat       : ${_meals[index].fat.round()}g"),
-                                  SizedBox(height: 10,),
-                                  Center(
-                                    child: OutlinedButton(onPressed: ()=>{removeMeal(_meals[index])}, child: Text("Remove meal",style: Theme.of(context).textTheme.bodyLarge)),
-                                  )
-                                ],
-
-                            )
-                          ],
-                        )
-                      );
-
-
-                    }
-                  )
-                )
-              ],
-            )
-          );
+            child: FutureBuilder(future: isConnectedToInternet(), builder: (context,snapshot){
+              if(snapshot.connectionState == ConnectionState.done){
+                if(snapshot.data == true){
+                  return mealsList();
+                }
+                else {
+                  return Center(
+                    child: Text("Not connected to internet",style: Theme.of(context).textTheme.bodyMedium,),
+                  );
+                }
+              }
+              else{
+                return Shimmer.fromColors(
+                  baseColor: Theme.of(context).primaryColor, 
+                  highlightColor: Theme.of(context).unselectedWidgetColor,
+                  child: mealsList(),
+                );
+              }
+            })
+          )
+        ],
+      )
+    );
   }
 
   Future<void> getGoals() async {
@@ -159,176 +183,103 @@ class _SettingsPageState extends State<SettingsPage>
 
   Future<void> setCarbsGoal() async {
     if(int.tryParse(_carbsGoalController.text)==null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the carbs goal textbox"),duration: Duration(seconds: 2)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the carbs goal textbox",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2)));
     }
     else {
       await DatabaseManager.setCarbsGoal(int.parse(_carbsGoalController.text));
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Carbohydrate goal updated"),duration: Duration(seconds: 2)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Carbohydrate goal updated",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2)));
     }
   }
 
   Future<void> setProteinGoal() async {
     if(int.tryParse(_proteinGoalController.text)==null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the protein goal textbox"),duration: Duration(seconds: 2)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the protein goal textbox",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2)));
     }
     else {
       await DatabaseManager.setProteinGoal(int.parse(_proteinGoalController.text));
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Protein goal updated"),duration: Duration(seconds: 2)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Protein goal updated",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2)));
     }
   }
 
   Future<void> setSaltGoal() async {
     if(int.tryParse(_saltGoalController.text)==null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the salt goal textbox"),duration: Duration(seconds: 2)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the salt goal textbox",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2)));
     }
     else {
       await DatabaseManager.setSaltGoal(int.parse(_saltGoalController.text));
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Salt goal updated"),duration: Duration(seconds: 2)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Salt goal updated",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2)));
     }
   }
 
   Future<void> setFatGoal() async {
     if(int.tryParse(_fatGoalController.text)==null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the fat goal textbox"),duration: Duration(seconds: 2)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the fat goal textbox",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2)));
     }
     else {
       await DatabaseManager.setFatGoal(int.parse(_fatGoalController.text));
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Fat goal updated"),duration: Duration(seconds: 2)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Fat goal updated",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2)));
     }
   }
 
 
+  Widget goal(String header, TextEditingController controller, Function() updateGoal){
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(header),
+        SizedBox(height: 5,),
+        SizedBox(
+          width: 400,
+          height: 40,
+          child: TextField(
+            textAlignVertical: TextAlignVertical.top,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            controller: controller,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Theme.of(context).unselectedWidgetColor,
+              border: OutlineInputBorder(),
+              suffixIcon:OutlinedButton(
+                onPressed: updateGoal,
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: Theme.of(context).textTheme.bodyLarge!.color!),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                  backgroundColor: Theme.of(context).highlightColor.withOpacity(0.3)
+                ), 
+                child: Icon(Icons.check,color: Theme.of(context).textTheme.bodyLarge!.color!,)
+              )
+            ),
+          ),
+        ),
+      ],
+    );
+    
+  }
+
   Widget goalsTab()
   {
     return Container(
-            decoration: BoxDecoration(
-              border: Border.all(),
-            ),
-            child: ExpansionTile(
-              childrenPadding: EdgeInsets.all(8),
-              title: Text("Goals",style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color)),
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text("Carbs goal (g): "),
-                    SizedBox(width: 20,),
-                    SizedBox(
-                      width: 200,
-                      height: 45,
-                      child: TextField(
-                      keyboardType: TextInputType.number,
-
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      controller: _carbsGoalController,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Theme.of(context).primaryColor,
-                        hintText: "Enter carbs goal",
-                        border: OutlineInputBorder(),
-                        suffixIcon:OutlinedButton(onPressed: setCarbsGoal, 
-                        child: Icon(Icons.check),
-                        style: ButtonStyle(
-                          shape: MaterialStateProperty.all(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6)
-                            )
-                          )
-                        ),
-                        )
-                      ),
-                    ),
-                    ),
-                    SizedBox(height: 8,),
-                    Text("Protein goal (g): "),
-                    SizedBox(width: 20,),
-                    SizedBox(
-                      width: 200,
-                      height: 45,
-                      child: TextField(
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      controller: _proteinGoalController,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Theme.of(context).primaryColor,
-                        hintText: "Enter protein goal",
-                        border: OutlineInputBorder(),
-                        suffixIcon:OutlinedButton(onPressed: setProteinGoal, 
-                        child: Icon(Icons.check),
-                        style: ButtonStyle(
-                          shape: MaterialStateProperty.all(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6)
-                            )
-                          )
-                        ),
-                        )
-                      ),
-                    ),
-                    ),
-                    SizedBox(height: 8,),
-                    Text("Fat goal (g): "),
-                    SizedBox(width: 20,),
-                    SizedBox(
-                      width: 200,
-                      height: 45,
-                      child: TextField(
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      controller: _fatGoalController,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Theme.of(context).primaryColor,
-                        hintText: "Enter fat goal",
-                        border: OutlineInputBorder(),
-                        suffixIcon:OutlinedButton(onPressed: setFatGoal, 
-                        child: Icon(Icons.check),
-                        style: ButtonStyle(
-                          shape: MaterialStateProperty.all(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6)
-                            )
-                          )
-                        ),
-                        )
-                      ),
-                    ),
-                    ),
-                    SizedBox(height: 8,),
-                    Text("Salt goal (g): "),
-                    SizedBox(width: 20,),
-                    SizedBox(
-                      width: 200,
-                      height: 45,
-                      child: TextField(
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      controller: _saltGoalController,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Theme.of(context).primaryColor,
-                        hintText: "Enter salt goal",
-                        border: OutlineInputBorder(),
-                        suffixIcon:OutlinedButton(onPressed: setSaltGoal, 
-                        child: Icon(Icons.check),
-                        style: ButtonStyle(
-                          shape: MaterialStateProperty.all(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6)
-                            )
-                          )
-                        ),
-                        )
-                      ),
-                    ),
-                    ),
-                  ],
-                )
-              ],
-            )
-          );
+      decoration: BoxDecoration(
+        border: Border.all(color: Theme.of(context).highlightColor),
+        color: Theme.of(context).primaryColor,
+      ),
+      child: ExpansionTile(
+        childrenPadding: EdgeInsets.all(8),
+        title: Text("Goals",style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color)),
+        children: [
+          SizedBox(height: 8,),
+          goal("Carbs goal (g) :", _carbsGoalController, setCarbsGoal),
+          SizedBox(height: 8,),
+          goal("Protein goal (g) :", _proteinGoalController, setProteinGoal),
+          SizedBox(height: 8,),
+          goal("Fat goal (g) :", _fatGoalController, setFatGoal),
+          SizedBox(height: 8,),
+          goal("Salt goal (g) :", _saltGoalController, setSaltGoal)
+        ],
+      )
+    );
   }
   
   void toggleDarkMode() async {
@@ -346,44 +297,45 @@ class _SettingsPageState extends State<SettingsPage>
 
   Widget customizationTab(){
     return Container(
-            decoration: BoxDecoration(
-              border: Border.all(),
-            ),
-            child: ExpansionTile(
-              childrenPadding: EdgeInsets.all(8),
-              title: Text("Customization",style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color)),
-              children: [
-                Row(
-                  children: [
-                    Text("Use dark mode:"),
-                    IconButton(onPressed: toggleDarkMode, icon:
-                      FutureBuilder(
-                        future: DatabaseManager.isDarkMode(), 
-                        builder: (context,snapshot){
-                          if(snapshot.connectionState==ConnectionState.waiting){
-                            return Icon(Icons.refresh);
-                          }
-                          else if(snapshot.connectionState==ConnectionState.done){
-                            if(snapshot.data==true){
-                              return Icon(Icons.toggle_on);
-                            }
-                            else{
-                              return Icon(Icons.toggle_off_outlined);
-                            }
-                          }
-                          else{
-                            return Icon(Icons.error);
-                          }
-                          
-                        }
-                      )
-                    )
-                     //IconButton(onPressed: toggleDarkMode, icon: Icon((()?Icons.toggle_on:Icons.toggle_off_outlined)))
-                  ],
+      decoration: BoxDecoration(
+      border: Border.all(color: Theme.of(context).highlightColor),
+        color: Theme.of(context).primaryColor,
+      ),
+      child: ExpansionTile(
+        childrenPadding: EdgeInsets.all(8),
+        title: Text("Customization",style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color)),
+        children: [
+          Row(
+            children: [
+              Text("Use dark mode:"),
+              IconButton(onPressed: toggleDarkMode, icon:
+                FutureBuilder(
+                  future: DatabaseManager.isDarkMode(), 
+                  builder: (context,snapshot){
+                    if(snapshot.connectionState==ConnectionState.waiting){
+                      return Icon(Icons.refresh);
+                    }
+                    else if(snapshot.connectionState==ConnectionState.done){
+                      if(snapshot.data==true){
+                        return Icon(Icons.toggle_on);
+                      }
+                      else{
+                        return Icon(Icons.toggle_off_outlined);
+                      }
+                    }
+                    else{
+                      return Icon(Icons.error);
+                    }
+                    
+                  }
                 )
-              ],
-            )
-          );
+              )
+               //IconButton(onPressed: toggleDarkMode, icon: Icon((()?Icons.toggle_on:Icons.toggle_off_outlined)))
+            ],
+          )
+        ],
+      )
+    );
   }
   @override
   void initState()

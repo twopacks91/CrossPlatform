@@ -69,7 +69,7 @@ class _FavouritesPageState extends State<FavouritesPage>
     });
     Food food = _foodList[_foodInfoIndex];
     await FirebaseFirestore.instance.collection("favfoods").doc(food.barcode).delete();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food removed from favourites list"),duration: Duration(seconds: 2),));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food removed from favourites list",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2),));
   }
 
   void tappedFood(int index)
@@ -250,11 +250,11 @@ class _FavouritesPageState extends State<FavouritesPage>
       setState(() {
       _showFoodInfo = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal added"),duration: Duration(seconds: 2),));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal added",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2),));
     }
     else
     {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Enter a meal weight before adding"),duration: Duration(seconds: 2),));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Enter a meal weight before adding",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2),));
     }
   }
 
@@ -279,7 +279,7 @@ class _FavouritesPageState extends State<FavouritesPage>
       itemBuilder: (context,index) {
         return Shimmer.fromColors(
           baseColor: Theme.of(context).primaryColor, 
-          highlightColor: Theme.of(context).unselectedWidgetColor,
+          highlightColor: Theme.of(context).splashColor,
           child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(

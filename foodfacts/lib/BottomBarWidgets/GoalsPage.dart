@@ -87,7 +87,7 @@ class _GoalsPageState extends State<GoalsPage>
   void removeMeal(Food meal) async{
     String docName = meal.barcode + meal.timeAdded.toString();
     await FirebaseFirestore.instance.collection("meals").doc(docName).delete();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal removed"),duration: Duration(seconds: 2),));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal removed",style: Theme.of(context).textTheme.bodyMedium,),duration: Duration(seconds: 2),));
     fetchMeals();
   }
 

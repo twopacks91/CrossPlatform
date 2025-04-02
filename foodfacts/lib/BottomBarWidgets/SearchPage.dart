@@ -89,7 +89,7 @@ class _SearchPageState extends State<SearchPage>
     setState(() {
       _showFoodInfoScreen = false;
     });
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food added to favourites list"),duration: Duration(seconds: 2),));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food added to favourites list",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2),));
   }
 
   void removeFoodFromFavourites() async
@@ -99,7 +99,7 @@ class _SearchPageState extends State<SearchPage>
     });
     Food food = _foodList[_foodInfoIndex];
     await FirebaseFirestore.instance.collection("favfoods").doc(food.barcode).delete();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food removed from favourites list"),duration: Duration(seconds: 2),));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food removed from favourites list",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2),));
   }
 
   void tappedFood(int index)
@@ -125,12 +125,12 @@ class _SearchPageState extends State<SearchPage>
       itemBuilder: (context,index) {
         return Shimmer.fromColors(
           baseColor: Theme.of(context).primaryColor, 
-          highlightColor: Theme.of(context).unselectedWidgetColor,
+          highlightColor: Theme.of(context).splashColor,
           child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(8)),
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).highlightColor,
                   border: Border.all(color: Theme.of(context).highlightColor)
                 ),
               ),
@@ -301,11 +301,11 @@ class _SearchPageState extends State<SearchPage>
       setState(() {
       _showFoodInfoScreen = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal added"),duration: Duration(seconds: 2),));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal added",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2),));
     }
     else
     {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Enter a meal weight before adding"),duration: Duration(seconds: 2),));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Enter a meal weight before adding",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2),));
     }
   }
 
@@ -473,7 +473,7 @@ class _SearchPageState extends State<SearchPage>
                         style: OutlinedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
-                          onPressed: (){ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Still talking with database, try again later"),duration: Duration(seconds: 2),));},
+                          onPressed: (){ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Still talking with database, try again later",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2),));},
                           child: Text('Add to favourites',style: Theme.of(context).textTheme.bodyMedium)
                         );
                     }

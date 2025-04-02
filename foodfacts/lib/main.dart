@@ -70,7 +70,8 @@ class _MyAppState extends State<MyApp>{
         snackBarTheme: const SnackBarThemeData(
           backgroundColor: Color.fromARGB(255, 100, 80, 150),
           elevation: 8
-        )
+        ),
+        splashColor: const Color.fromARGB(255, 100, 80, 150),
       );
 
   ThemeData lightTheme = ThemeData(
@@ -84,9 +85,10 @@ class _MyAppState extends State<MyApp>{
           bodyMedium: TextStyle(color: Colors.black,fontSize: 12),
         ),
         snackBarTheme: const SnackBarThemeData(
-          backgroundColor: Color.fromARGB(255, 30, 25, 50),
+          backgroundColor: Color.fromARGB(255, 235, 220, 255),
           elevation: 8
-        )
+        ),
+        splashColor: const Color.fromARGB(255, 190, 180, 230),
       );
 
   @override
