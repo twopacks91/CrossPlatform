@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:foodfacts/MyWidgets/MySnackBar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:foodfacts/Food.dart';
@@ -89,7 +90,7 @@ class _SearchPageState extends State<SearchPage>
       _showFoodInfoScreen = false;
     });
     if(mounted){
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food added to favourites list",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));
+      ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Food added to favourites list",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));
     }
   }
 
@@ -101,7 +102,7 @@ class _SearchPageState extends State<SearchPage>
     Food food = _foodList[_foodInfoIndex];
     await FirebaseFirestore.instance.collection("favfoods").doc(food.barcode).delete();
     if(mounted){
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food removed from favourites list",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));
+      ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Food removed from favourites list",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));
     }
   }
 
@@ -296,7 +297,7 @@ class _SearchPageState extends State<SearchPage>
     Food food = _foodList[_foodInfoIndex];
     food.timeAdded = timeStamp;
     String docName = food.barcode + timeStamp.toString();
-    double weight = int.parse(_weightEntryController.text).toDouble();
+    double weight = (int.tryParse(_weightEntryController.text) ?? 0).toDouble();
     if(weight>0)
     {
       food.weight = weight;
@@ -305,12 +306,12 @@ class _SearchPageState extends State<SearchPage>
       _showFoodInfoScreen = false;
       });
       if(mounted){
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal added",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));
+        ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Meal added",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));
       }
     }
     else
     {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Enter a meal weight before adding",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));
+      ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Enter a meal weight before adding",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));
     }
   }
 
@@ -478,7 +479,7 @@ class _SearchPageState extends State<SearchPage>
                         style: OutlinedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
-                          onPressed: (){ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Still talking with database, try again later",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));},
+                          onPressed: (){ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Still talking with database, try again later",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));},
                           child: Text('Add to favourites',style: Theme.of(context).textTheme.bodyMedium)
                         );
                     }

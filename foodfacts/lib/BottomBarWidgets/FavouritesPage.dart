@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:foodfacts/Food.dart';
+import 'package:foodfacts/MyWidgets/MySnackBar.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:http/http.dart' as http;
 
@@ -70,7 +71,7 @@ class _FavouritesPageState extends State<FavouritesPage>
     Food food = _foodList[_foodInfoIndex];
     await FirebaseFirestore.instance.collection("favfoods").doc(food.barcode).delete();
     if(mounted){
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food removed from favourites list",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));
+      ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Food removed from favourites list",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));
     }
   }
 
@@ -190,6 +191,7 @@ class _FavouritesPageState extends State<FavouritesPage>
 
   Future<bool> isConnectedToInternet() async{
     try{
+      // ignore: unused_local_variable
       dynamic resp = await http.get(Uri.parse("https://example.com/api/fetch?limit=10,20,30&max=100"));
       return true;
     }
@@ -244,7 +246,7 @@ class _FavouritesPageState extends State<FavouritesPage>
     Food food = _foodList[_foodInfoIndex];
     food.timeAdded = timeStamp;
     String docName = food.barcode + timeStamp.toString();
-    double weight = int.parse(_weightEntryController.text).toDouble();
+    double weight = (int.tryParse(_weightEntryController.text) ?? 0).toDouble();
     if(weight>0)
     {
       food.weight = weight;
@@ -253,13 +255,13 @@ class _FavouritesPageState extends State<FavouritesPage>
       _showFoodInfo = false;
       });
       if(mounted){
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal added",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));
+        ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Meal added",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
       }
     }
     else
     {
       if(mounted){
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Enter a meal weight before adding",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));      
+        ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Enter a meal weight before adding",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));      
       }
       
     }

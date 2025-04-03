@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:foodfacts/DatabaseManager.dart';
+import 'package:foodfacts/MyWidgets/MySnackBar.dart';
 import 'package:foodfacts/main.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
@@ -68,12 +69,13 @@ class _SettingsPageState extends State<SettingsPage>
   void removeMeal(Food meal) async{
     String docName = meal.barcode + meal.timeAdded.toString();
     await FirebaseFirestore.instance.collection("meals").doc(docName).delete();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal removed",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));
+    ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Meal removed",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));
     fetchMeals();
   }
 
   Future<bool> isConnectedToInternet() async{
     try{
+      // ignore: unused_local_variable
       dynamic resp = await http.get(Uri.parse("https://example.com/api/fetch?limit=10,20,30&max=100"));
       return true;
     }
@@ -182,48 +184,48 @@ class _SettingsPageState extends State<SettingsPage>
 
   Future<void> setCarbsGoal() async {
     if(int.tryParse(_carbsGoalController.text)==null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the carbs goal textbox",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
+      ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Please enter a number in the carbs goal textbox",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
     }
     else {
       await DatabaseManager.setCarbsGoal(int.parse(_carbsGoalController.text));
       if(mounted){
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Carbohydrate goal updated",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
+        ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Carbohydrate goal updated",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
       }
     }
   }
 
   Future<void> setProteinGoal() async {
     if(int.tryParse(_proteinGoalController.text)==null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the protein goal textbox",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
+      ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Please enter a number in the protein goal textbox",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
     }
     else {
       await DatabaseManager.setProteinGoal(int.parse(_proteinGoalController.text));
       if(mounted){
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Protein goal updated",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
+        ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Protein goal updated",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
       }
     }
   }
 
   Future<void> setSaltGoal() async {
     if(int.tryParse(_saltGoalController.text)==null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the salt goal textbox",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
+      ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Please enter a number in the salt goal textbox",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
     }
     else {
       await DatabaseManager.setSaltGoal(int.parse(_saltGoalController.text));
       if(mounted){
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Salt goal updated",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
+        ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Salt goal updated",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
       }
     }
   }
 
   Future<void> setFatGoal() async {
     if(int.tryParse(_fatGoalController.text)==null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the fat goal textbox",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
+      ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Please enter a number in the fat goal textbox",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
     }
     else {
       await DatabaseManager.setFatGoal(int.parse(_fatGoalController.text));
       if(mounted){
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Fat goal updated",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
+        ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Fat goal updated",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
       }
     }
   }

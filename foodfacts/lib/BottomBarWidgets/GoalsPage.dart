@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:foodfacts/DatabaseManager.dart';
 import 'package:foodfacts/Food.dart';
+import 'package:foodfacts/MyWidgets/MySnackBar.dart';
 import 'package:intl/intl.dart';
 import '../MyWidgets/GoalProgressCircle.dart';
 
@@ -87,7 +88,7 @@ class _GoalsPageState extends State<GoalsPage>
   void removeMeal(Food meal) async{
     String docName = meal.barcode + meal.timeAdded.toString();
     await FirebaseFirestore.instance.collection("meals").doc(docName).delete();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal removed",style: Theme.of(context).textTheme.bodyMedium,),duration: const Duration(seconds: 2),));
+    ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Meal removed",style: Theme.of(context).textTheme.bodyMedium,),duration: const Duration(seconds: 2),));
     fetchMeals();
   }
 

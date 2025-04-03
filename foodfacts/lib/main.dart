@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:ui';
+
 import 'BottomBarWidgets/SearchPage.dart';
 import 'BottomBarWidgets/GoalsPage.dart';
 import 'BottomBarWidgets/FavouritesPage.dart';
@@ -36,6 +38,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp>{
   bool _useDarkMode = false;
+  FlutterView view = WidgetsBinding.instance.platformDispatcher.views.first;
 
   // Rebuild the entire app widget tree 
   void rebuild(){
@@ -68,10 +71,8 @@ class _MyAppState extends State<MyApp>{
           bodyMedium: TextStyle(color: Colors.white,fontSize: 12),
         ),
         snackBarTheme: const SnackBarThemeData(
-          insetPadding: EdgeInsets.only(bottom: 50),
           backgroundColor: Color.fromARGB(255, 100, 80, 150),
-          behavior: SnackBarBehavior.floating,
-
+          behavior: SnackBarBehavior.fixed,
         ),
         splashColor: const Color.fromARGB(255, 100, 80, 150),
       );
@@ -87,11 +88,8 @@ class _MyAppState extends State<MyApp>{
           bodyMedium: TextStyle(color: Colors.black,fontSize: 12),
         ),
         snackBarTheme: const SnackBarThemeData(
-          behavior: SnackBarBehavior.floating,
-
-          insetPadding: EdgeInsets.only(bottom: 20),
           backgroundColor: Color.fromARGB(255, 235, 220, 255),
-          
+          behavior: SnackBarBehavior.fixed,
         ),
         splashColor: const Color.fromARGB(255, 190, 180, 230),
       );
