@@ -7,24 +7,45 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:foodfacts/MyWidgets/GoalProgressCircle.dart';
 
-import 'package:foodfacts/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets("Progress circle overruns when progress>1", (tester) async {
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Create testing environment for progress circle
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          // Progress set to 1.2 to make cicle overrun
+          body: GoalProgressCircle(diameter: 100, progress: 1.2, child: Text("Test"))
+        )
+      )
+    );
+    
+    // Get references to the circular progress indicators (CPIs) inside the progress circle
+    final cPIs = tester.widgetList<CircularProgressIndicator>(find.byType(CircularProgressIndicator)).toList();
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // Ensure that the value of the red CPI has been set to a non zero value
+    expect(cPIs[2].value, greaterThan(0));
+  });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  testWidgets("Progress circle doesnt overrun when progress<1", (tester) async {
+
+    // Create testing environment for progress circle
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          // Progress set to 0.8 to make cicle not overrun
+          body: GoalProgressCircle(diameter: 100, progress: 0.8, child: Text("Test"))
+        )
+      )
+    );
+    
+    // Get references to the circular progress indicators (CPIs) inside the progress circle
+    final cPIs = tester.widgetList<CircularProgressIndicator>(find.byType(CircularProgressIndicator)).toList();
+
+    // Ensure that the value of the red CPI has been set to a value less than zero
+    expect(cPIs[2].value, lessThanOrEqualTo(0));
   });
 }
