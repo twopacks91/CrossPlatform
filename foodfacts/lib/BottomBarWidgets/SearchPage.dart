@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:foodfacts/MyWidgets/InternetImage.dart';
 import 'package:foodfacts/MyWidgets/MySnackBar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -197,10 +198,9 @@ class _SearchPageState extends State<SearchPage>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.network(
-                      _foodList[index].imageUrl,
-                      height: 150,
-                      fit: BoxFit.fill,
+                    InternetImage(
+                      url: _foodList[index].imageUrl, 
+                      height: 150
                     ),
                     const SizedBox(height: 10),
                     Text(
@@ -215,6 +215,7 @@ class _SearchPageState extends State<SearchPage>
         );
       }
   }
+
 
   void updateFoodList() async {
     setState(() {
@@ -351,10 +352,10 @@ class _SearchPageState extends State<SearchPage>
             const SizedBox(height: 20,),
             SizedBox(
               height: 200,
-              child: Image.network(
-                _foodList[_foodInfoIndex].imageUrl,
-                fit: BoxFit.fill,
-              )
+              child: InternetImage(
+                url: _foodList[_foodInfoIndex].imageUrl, 
+                height: 150
+              ),
             ),
             const Expanded(child: SizedBox(),),
             Row(

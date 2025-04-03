@@ -14,6 +14,24 @@ class DatabaseManager {
       return darkMode;
     }
   }
+
+  // Non static method for use in testing
+  Future<int> getCarbsGoalTest() async {
+    final prefs = await SharedPreferences.getInstance();
+    int? goal = prefs.getInt('carbsGoal');
+    if(goal==null){
+      setCarbsGoalTest(260);
+      return 260; 
+    }
+    return goal;
+  }
+
+  // Non static method for use in testing
+  Future<void> setCarbsGoalTest(int goal) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt('carbsGoal', goal);
+  }
+  
   
   static Future<void> setDarkMode(bool set) async {
     final prefs = await SharedPreferences.getInstance();
@@ -24,8 +42,8 @@ class DatabaseManager {
     final prefs = await SharedPreferences.getInstance();
     int? goal = prefs.getInt('carbsGoal');
     if(goal==null){
-      setCarbsGoal(200);
-      return 200;
+      setCarbsGoal(260);
+      return 260;
     }
     return goal;
   }
@@ -34,8 +52,8 @@ class DatabaseManager {
     final prefs = await SharedPreferences.getInstance();
     int? goal = prefs.getInt('proteinGoal');
     if(goal==null){
-      setProteinGoal(40);
-      return 40;
+      setProteinGoal(56);
+      return 56;
     }
     return goal;
   }
@@ -44,8 +62,8 @@ class DatabaseManager {
     final prefs = await SharedPreferences.getInstance();
     int? goal = prefs.getInt('fatGoal');
     if(goal==null){
-      setFatGoal(40);
-      return 40;
+      setFatGoal(70);
+      return 70;
     }
     return goal;
   }
@@ -54,8 +72,8 @@ class DatabaseManager {
     final prefs = await SharedPreferences.getInstance();
     int? goal = prefs.getInt('saltGoal');
     if(goal==null){
-      setSaltGoal(10);
-      return 10;
+      setSaltGoal(6);
+      return 6;
     }
     return goal;
   }

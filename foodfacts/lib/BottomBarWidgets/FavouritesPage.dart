@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:foodfacts/Food.dart';
+import 'package:foodfacts/MyWidgets/InternetImage.dart';
 import 'package:foodfacts/MyWidgets/MySnackBar.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:http/http.dart' as http;
@@ -111,7 +112,10 @@ class _FavouritesPageState extends State<FavouritesPage>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  internetImage(_foodList[index].imageUrl, 150),
+                  InternetImage(
+                    url: _foodList[index].imageUrl,
+                    height: 150
+                  ),
                   const SizedBox(height: 10),
                   Text(
                     _foodList[index].name,
@@ -125,24 +129,7 @@ class _FavouritesPageState extends State<FavouritesPage>
       );
   }
 
-  Image internetImage(String url, double height){
-    Image im;
-    try{
-      im = Image.network(
-        url,
-        height: height,
-        fit: BoxFit.fill,
-      );
-    }
-    catch(ex){
-      im = Image(
-        image: const AssetImage('assets/nointernet.png'),
-        height: height,
-        fit: BoxFit.fill,
-      );
-    }
-    return im;
-  }
+
 
   Scaffold foodList()
   {
@@ -198,7 +185,6 @@ class _FavouritesPageState extends State<FavouritesPage>
     catch(ex){
       return false;
     }
-    
   }
   
   void decreaseWeight()
@@ -314,9 +300,9 @@ class _FavouritesPageState extends State<FavouritesPage>
             const SizedBox(height: 20,),
             SizedBox(
               height: 200,
-              child: internetImage(
-                _foodList[_foodInfoIndex].imageUrl,
-                200,
+              child: InternetImage(
+                url: _foodList[_foodInfoIndex].imageUrl,
+                height: 200,
               )
             ),
             const Expanded(child: SizedBox(),),

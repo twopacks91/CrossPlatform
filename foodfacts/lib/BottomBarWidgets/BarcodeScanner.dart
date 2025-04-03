@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:foodfacts/MyWidgets/InternetImage.dart';
+import 'package:foodfacts/MyWidgets/MySnackBar.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 import '../Food.dart';
@@ -62,7 +64,7 @@ class _BarcodeScannerState extends State<Barcodescanner>
 
   Future<void> fetchFood() async {
     final uri = Uri.parse('https://world.openfoodfacts.org/api/v2/product/$_scannedBarcode&json=true');
-    final resp;
+    final dynamic resp;
     try{
       resp = await http.get(uri);
     }
@@ -167,16 +169,16 @@ class _BarcodeScannerState extends State<Barcodescanner>
     Food food = _scannedFood;
     food.timeAdded = timeStamp;
     String docName = food.barcode + timeStamp.toString();
-    double weight = int.parse(_weightEntryController.text).toDouble();
+    double weight = (int.tryParse(_weightEntryController.text) ?? 0).toDouble();
     if(weight>0)
     {
       food.weight = weight;
       await FirebaseFirestore.instance.collection("meals").doc(docName).set(food.asMap());
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal added"),duration: Duration(seconds: 2),));
+      ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Meal added"),duration: Duration(seconds: 2),));
     }
     else
     {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Enter a meal weight before adding"),duration: Duration(seconds: 2),));
+      ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Enter a meal weight before adding"),duration: Duration(seconds: 2),));
     }
   }
 
@@ -195,7 +197,7 @@ class _BarcodeScannerState extends State<Barcodescanner>
     });
     Food food = _scannedFood;
     await FirebaseFirestore.instance.collection("favfoods").doc(food.barcode).delete();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food removed from favourites list"),duration: Duration(seconds: 2),));
+    ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Food removed from favourites list"),duration: Duration(seconds: 2),));
   }
 
   Scaffold foodInfoScreen()
@@ -209,10 +211,9 @@ class _BarcodeScannerState extends State<Barcodescanner>
           children: [
             SizedBox(height: 20,),
             SizedBox(
-              height: 200,
-              child: Image.network(
-                _scannedFood.imageUrl,
-                fit: BoxFit.fill,
+              child: InternetImage(
+                url: _scannedFood.imageUrl,
+                height: 200
               )
             ),
             Expanded(child: SizedBox(),),
@@ -338,7 +339,7 @@ class _BarcodeScannerState extends State<Barcodescanner>
                         style: OutlinedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
-                          onPressed: (){ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Still talking with database, try again later"),duration: Duration(seconds: 2),));},
+                          onPressed: (){ScaffoldMessenger.of(context).showSnackBar(MySnackBar(content: Text("Still talking with database, try again later"),duration: Duration(seconds: 2),));},
                           child: Text('Add to favourites',style: Theme.of(context).textTheme.bodyMedium)
                         );
                     }

@@ -10,7 +10,6 @@ import '../MyWidgets/GoalProgressCircle.dart';
 class GoalsPage extends StatefulWidget
 {
   const GoalsPage({super.key});
-  
 
   @override
   State<GoalsPage> createState()=> _GoalsPageState();
@@ -92,7 +91,7 @@ class _GoalsPageState extends State<GoalsPage>
     fetchMeals();
   }
 
-  Future<void> updateGoals() async {
+  Future<void> getGoals() async {
     int carbs = await DatabaseManager.getCarbsGoal();
     int protein = await DatabaseManager.getProteinGoal();
     int salt = await DatabaseManager.getSaltGoal();
@@ -109,10 +108,11 @@ class _GoalsPageState extends State<GoalsPage>
   void initState()
   {
     super.initState();
-    updateGoals();
+    getGoals();
     fetchMeals();
   }
 
+  // Turns a unix timestamp into a string with format hour:minute
   String unixToTimeString(int unix)
   {
     DateTime dt =DateTime.fromMillisecondsSinceEpoch(unix).toLocal();
@@ -129,6 +129,7 @@ class _GoalsPageState extends State<GoalsPage>
       body: Column(
         children: [
           const Padding(padding: const EdgeInsets.all(20)),
+          // Carbs wheel
           GoalProgressCircle(
                 diameter: 200, 
                 progress: carbsProgress,
@@ -143,6 +144,7 @@ class _GoalsPageState extends State<GoalsPage>
           const SizedBox(height: 20),
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, 
             children: [
+              // Protein wheel
               GoalProgressCircle(
                 diameter: 100, 
                 progress: proteinProgress,
@@ -154,6 +156,7 @@ class _GoalsPageState extends State<GoalsPage>
                   ]
                 ),
               ),
+              // Salt wheel
               GoalProgressCircle(
                 diameter: 100, 
                 progress: saltProgress,
@@ -165,6 +168,7 @@ class _GoalsPageState extends State<GoalsPage>
                   ]
                 ),
               ),
+              // Fat wheel
               GoalProgressCircle(
                 diameter: 100, 
                 progress: fatProgress,
@@ -179,6 +183,7 @@ class _GoalsPageState extends State<GoalsPage>
             ], 
           ),
           const SizedBox(height: 20,),
+          // Meal list
           Padding(padding: const EdgeInsets.all(8),child: 
           Container(
             width: 420,
