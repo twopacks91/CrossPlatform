@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:foodfacts/DatabaseManager.dart';
@@ -87,7 +87,7 @@ class _GoalsPageState extends State<GoalsPage>
   void removeMeal(Food meal) async{
     String docName = meal.barcode + meal.timeAdded.toString();
     await FirebaseFirestore.instance.collection("meals").doc(docName).delete();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal removed",style: Theme.of(context).textTheme.bodyMedium,),duration: Duration(seconds: 2),));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal removed",style: Theme.of(context).textTheme.bodyMedium,),duration: const Duration(seconds: 2),));
     fetchMeals();
   }
 
@@ -127,7 +127,7 @@ class _GoalsPageState extends State<GoalsPage>
       backgroundColor: Theme.of(context).canvasColor,
       body: Column(
         children: [
-          Padding(padding: EdgeInsets.all(20)),
+          const Padding(padding: const EdgeInsets.all(20)),
           GoalProgressCircle(
                 diameter: 200, 
                 progress: carbsProgress,
@@ -135,11 +135,11 @@ class _GoalsPageState extends State<GoalsPage>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text("${carbsTotal.round()}g"),
-                    Text("Carbs"),
+                    const Text("Carbs"),
                   ]
                 ),
               ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, 
             children: [
               GoalProgressCircle(
@@ -149,7 +149,7 @@ class _GoalsPageState extends State<GoalsPage>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text("${proteinTotal.round()}g",style: Theme.of(context).textTheme.bodyLarge),
-                    Text("Protein"),
+                    const Text("Protein"),
                   ]
                 ),
               ),
@@ -160,7 +160,7 @@ class _GoalsPageState extends State<GoalsPage>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text("${saltTotal.round()}g",style: Theme.of(context).textTheme.bodyLarge),
-                    Text("Salt"),
+                    const Text("Salt"),
                   ]
                 ),
               ),
@@ -171,19 +171,19 @@ class _GoalsPageState extends State<GoalsPage>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text("${fatTotal.round()}g",style: Theme.of(context).textTheme.bodyLarge),
-                    Text("Fat"),
+                    const Text("Fat"),
                   ]
                 ),
               ),
             ], 
           ),
-          SizedBox(height: 20,),
-          Padding(padding: EdgeInsets.all(8),child: 
+          const SizedBox(height: 20,),
+          Padding(padding: const EdgeInsets.all(8),child: 
           Container(
             width: 420,
             height: 320,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
               border: Border.all(color: Theme.of(context).highlightColor),
               color: Theme.of(context).primaryColor
             ),
@@ -196,7 +196,7 @@ class _GoalsPageState extends State<GoalsPage>
             // Else display meal list
             ListView.builder(
               itemCount: _meals.length,
-              padding: EdgeInsets.all(0),
+              padding: const EdgeInsets.all(0),
               itemBuilder: (context,index){
                 return Container(
                   decoration: BoxDecoration(
@@ -205,7 +205,7 @@ class _GoalsPageState extends State<GoalsPage>
                   ),
                   child: ExpansionTile(
                     title: Text("${_meals[index].name} : ${_meals[index].weight.toString()}g",style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color),),
-                    childrenPadding: EdgeInsets.all(8),
+                    childrenPadding: const EdgeInsets.all(8),
                     children: [
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,18 +216,15 @@ class _GoalsPageState extends State<GoalsPage>
                             Text("Protein   : ${_meals[index].protein.round()}g"),
                             Text("Salt      : ${_meals[index].salt.round()}g"),
                             Text("Fat       : ${_meals[index].fat.round()}g"),
-                            SizedBox(height: 10,),
+                            const SizedBox(height: 10,),
                             Center(
                               child: OutlinedButton(onPressed: ()=>{removeMeal(_meals[index])}, child: Text("Remove meal",style: Theme.of(context).textTheme.bodyLarge)),
                             )
                           ],
-                        
                       )
                     ],
                   )
                 );
-                
-                
               }
             )
             )

@@ -1,4 +1,3 @@
-// ignore_for_file: prefer_const_constructors
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,8 +17,8 @@ class SearchPage extends StatefulWidget
 class _SearchPageState extends State<SearchPage>
 {
   List<Food> _foodList = [];
-  TextEditingController _searchBarController = TextEditingController();
-  TextEditingController _weightEntryController = TextEditingController();
+  final TextEditingController _searchBarController = TextEditingController();
+  final TextEditingController _weightEntryController = TextEditingController();
   String query = 'jaffa cake';
   bool _showFoodInfoScreen = false;
   int _foodInfoIndex = 0;
@@ -89,7 +88,9 @@ class _SearchPageState extends State<SearchPage>
     setState(() {
       _showFoodInfoScreen = false;
     });
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food added to favourites list",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2),));
+    if(mounted){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food added to favourites list",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));
+    }
   }
 
   void removeFoodFromFavourites() async
@@ -99,7 +100,9 @@ class _SearchPageState extends State<SearchPage>
     });
     Food food = _foodList[_foodInfoIndex];
     await FirebaseFirestore.instance.collection("favfoods").doc(food.barcode).delete();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food removed from favourites list",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2),));
+    if(mounted){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food removed from favourites list",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));
+    }
   }
 
   void tappedFood(int index)
@@ -120,7 +123,7 @@ class _SearchPageState extends State<SearchPage>
         crossAxisSpacing: 8.0,
         mainAxisSpacing: 8.0,
       ), 
-      padding: EdgeInsets.all(8),
+      padding: const EdgeInsets.all(8),
       itemCount: 6,
       itemBuilder: (context,index) {
         return Shimmer.fromColors(
@@ -129,7 +132,7 @@ class _SearchPageState extends State<SearchPage>
           child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
                   color: Theme.of(context).highlightColor,
                   border: Border.all(color: Theme.of(context).highlightColor)
                 ),
@@ -159,8 +162,8 @@ class _SearchPageState extends State<SearchPage>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [ (_failedToFetchFoods?
-                Text("Something went wrong :("):
-                Text("Please enter the name of a food in the text box above")
+                const Text("Something went wrong :("):
+                const Text("Please enter the name of a food in the text box above")
               )
               ],
             ),
@@ -186,7 +189,7 @@ class _SearchPageState extends State<SearchPage>
               child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
                   color: Theme.of(context).primaryColor,
                   border: Border.all(color: Theme.of(context).highlightColor)
                 ),
@@ -227,22 +230,22 @@ class _SearchPageState extends State<SearchPage>
       backgroundColor: Theme.of(context).canvasColor,
       body: Column(
         children: [
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Padding(
             padding: 
-            EdgeInsets.all(12),
+            const EdgeInsets.all(12),
               child: TextField(
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Theme.of(context).primaryColor,
                   hintText: "Enter food name",
                   hintStyle: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color),
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                   focusColor: Theme.of(context).highlightColor,
                   suffixIconColor: Theme.of(context).highlightColor,
                   suffixIcon: IconButton(
                     onPressed: updateFoodList, 
-                    icon: Icon(Icons.search)
+                    icon: const Icon(Icons.search)
                   )
                 ),
                 controller: _searchBarController
@@ -301,11 +304,13 @@ class _SearchPageState extends State<SearchPage>
       setState(() {
       _showFoodInfoScreen = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal added",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2),));
+      if(mounted){
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal added",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));
+      }
     }
     else
     {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Enter a meal weight before adding",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2),));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Enter a meal weight before adding",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));
     }
   }
 
@@ -338,11 +343,11 @@ class _SearchPageState extends State<SearchPage>
     return Scaffold(
       backgroundColor: Theme.of(context).canvasColor,
       body: Padding(
-        padding: EdgeInsets.all(12),
+        padding: const EdgeInsets.all(12),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            SizedBox(height: 20,),
+            const SizedBox(height: 20,),
             SizedBox(
               height: 200,
               child: Image.network(
@@ -350,7 +355,7 @@ class _SearchPageState extends State<SearchPage>
                 fit: BoxFit.fill,
               )
             ),
-            Expanded(child: SizedBox(),),
+            const Expanded(child: SizedBox(),),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -365,7 +370,7 @@ class _SearchPageState extends State<SearchPage>
                     child: Text('-',style: Theme.of(context).textTheme.bodyLarge,)
                   ),
                 ),
-                SizedBox(width: 8,),
+                const SizedBox(width: 8,),
                 Expanded(
                   child: TextField(
                     keyboardType: TextInputType.number,
@@ -375,13 +380,13 @@ class _SearchPageState extends State<SearchPage>
                       hintStyle: Theme.of(context).textTheme.bodyLarge,
                       filled:true,
                       fillColor: Theme.of(context).primaryColor,
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                     ),
                   controller: _weightEntryController,
                   textAlign: TextAlign.center,
                   ),
                 ),
-                SizedBox(width: 8,),
+                const SizedBox(width: 8,),
                 SizedBox(
                   width: 50,
                   height: 50,
@@ -395,9 +400,9 @@ class _SearchPageState extends State<SearchPage>
                 ),
               ],
             ),
-            Expanded(child: SizedBox(),),
+            const Expanded(child: SizedBox(),),
             Container(
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               width: 420,
               height: 300,
               decoration: BoxDecoration(
@@ -408,15 +413,15 @@ class _SearchPageState extends State<SearchPage>
               child: Column(
                 children: [
                   
-                  Text("Calories: ${_foodList[_foodInfoIndex].calories}kcal",style: TextStyle(fontSize: 20)),
-                  Text("Carbs   : ${_foodList[_foodInfoIndex].carbs}g",style: TextStyle(fontSize: 20)),
-                  Text("Protein : ${_foodList[_foodInfoIndex].protein}g",style: TextStyle(fontSize: 20)),
-                  Text("Salt    : ${_foodList[_foodInfoIndex].salt}g",style: TextStyle(fontSize: 20)),
-                  Text("Fat     : ${_foodList[_foodInfoIndex].fat}g",style: TextStyle(fontSize: 20)),
+                  Text("Calories: ${_foodList[_foodInfoIndex].calories.round()}kcal",style: const TextStyle(fontSize: 20)),
+                  Text("Carbs   : ${_foodList[_foodInfoIndex].carbs.round()}g",style: const TextStyle(fontSize: 20)),
+                  Text("Protein : ${_foodList[_foodInfoIndex].protein.round()}g",style: const TextStyle(fontSize: 20)),
+                  Text("Salt    : ${_foodList[_foodInfoIndex].salt.round()}g",style: const TextStyle(fontSize: 20)),
+                  Text("Fat     : ${_foodList[_foodInfoIndex].fat.round()}g",style: const TextStyle(fontSize: 20)),
                 ],
               ),
             ),
-            Expanded(child: SizedBox(),),
+            const Expanded(child: SizedBox(),),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -473,7 +478,7 @@ class _SearchPageState extends State<SearchPage>
                         style: OutlinedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
-                          onPressed: (){ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Still talking with database, try again later",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2),));},
+                          onPressed: (){ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Still talking with database, try again later",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));},
                           child: Text('Add to favourites',style: Theme.of(context).textTheme.bodyMedium)
                         );
                     }
@@ -481,7 +486,7 @@ class _SearchPageState extends State<SearchPage>
                   )
               ],
             ),
-            SizedBox(height: 20,)
+            const SizedBox(height: 20,)
           ],
         ),
       )

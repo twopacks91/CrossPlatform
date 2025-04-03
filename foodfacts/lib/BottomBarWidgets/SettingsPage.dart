@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,7 +8,6 @@ import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import '../Food.dart';
 import 'package:http/http.dart' as http;
-//import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget
 {
@@ -69,7 +68,7 @@ class _SettingsPageState extends State<SettingsPage>
   void removeMeal(Food meal) async{
     String docName = meal.barcode + meal.timeAdded.toString();
     await FirebaseFirestore.instance.collection("meals").doc(docName).delete();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal removed",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2),));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal removed",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));
     fetchMeals();
   }
 
@@ -87,7 +86,7 @@ class _SettingsPageState extends State<SettingsPage>
   Widget mealsList(){
     return ListView.builder(
       itemCount: _meals.length,
-      padding: EdgeInsets.all(0),
+      padding: const EdgeInsets.all(0),
       itemBuilder: (context,index){
         return Container(
           decoration: BoxDecoration(
@@ -96,7 +95,7 @@ class _SettingsPageState extends State<SettingsPage>
           ),
           child: ExpansionTile(
             title: Text("${_meals[index].name} : ${_meals[index].weight.toString()}g",style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color),),
-            childrenPadding: EdgeInsets.all(8),
+            childrenPadding: const EdgeInsets.all(8),
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,7 +106,7 @@ class _SettingsPageState extends State<SettingsPage>
                   Text("Protein   : ${_meals[index].protein.round()}g"),
                   Text("Salt      : ${_meals[index].salt.round()}g"),
                   Text("Fat       : ${_meals[index].fat.round()}g"),
-                  SizedBox(height: 10,),
+                  const SizedBox(height: 10,),
                   Center(
                     child: OutlinedButton(
                       onPressed: ()=>{removeMeal(_meals[index])}, 
@@ -130,14 +129,14 @@ class _SettingsPageState extends State<SettingsPage>
         color: Theme.of(context).primaryColor,
       ),
       child: ExpansionTile(
-        childrenPadding: EdgeInsets.all(8),
+        childrenPadding: const EdgeInsets.all(8),
         title: Text("Meal history",style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color)),
         children: [
           Container(
             width: 420,
             height: 320,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
               border: Border.all(color: Theme.of(context).highlightColor),
               color: Theme.of(context).primaryColor
             ),
@@ -183,41 +182,49 @@ class _SettingsPageState extends State<SettingsPage>
 
   Future<void> setCarbsGoal() async {
     if(int.tryParse(_carbsGoalController.text)==null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the carbs goal textbox",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the carbs goal textbox",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
     }
     else {
       await DatabaseManager.setCarbsGoal(int.parse(_carbsGoalController.text));
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Carbohydrate goal updated",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2)));
+      if(mounted){
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Carbohydrate goal updated",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
+      }
     }
   }
 
   Future<void> setProteinGoal() async {
     if(int.tryParse(_proteinGoalController.text)==null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the protein goal textbox",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the protein goal textbox",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
     }
     else {
       await DatabaseManager.setProteinGoal(int.parse(_proteinGoalController.text));
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Protein goal updated",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2)));
+      if(mounted){
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Protein goal updated",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
+      }
     }
   }
 
   Future<void> setSaltGoal() async {
     if(int.tryParse(_saltGoalController.text)==null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the salt goal textbox",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the salt goal textbox",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
     }
     else {
       await DatabaseManager.setSaltGoal(int.parse(_saltGoalController.text));
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Salt goal updated",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2)));
+      if(mounted){
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Salt goal updated",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
+      }
     }
   }
 
   Future<void> setFatGoal() async {
     if(int.tryParse(_fatGoalController.text)==null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the fat goal textbox",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a number in the fat goal textbox",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
     }
     else {
       await DatabaseManager.setFatGoal(int.parse(_fatGoalController.text));
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Fat goal updated",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2)));
+      if(mounted){
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Fat goal updated",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2)));
+      }
     }
   }
 
@@ -228,7 +235,7 @@ class _SettingsPageState extends State<SettingsPage>
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(header),
-        SizedBox(height: 5,),
+        const SizedBox(height: 5,),
         SizedBox(
           width: 400,
           height: 40,
@@ -240,7 +247,7 @@ class _SettingsPageState extends State<SettingsPage>
             decoration: InputDecoration(
               filled: true,
               fillColor: Theme.of(context).unselectedWidgetColor,
-              border: OutlineInputBorder(),
+              border: const OutlineInputBorder(),
               suffixIcon:OutlinedButton(
                 onPressed: updateGoal,
                 style: OutlinedButton.styleFrom(
@@ -266,16 +273,16 @@ class _SettingsPageState extends State<SettingsPage>
         color: Theme.of(context).primaryColor,
       ),
       child: ExpansionTile(
-        childrenPadding: EdgeInsets.all(8),
+        childrenPadding: const EdgeInsets.all(8),
         title: Text("Goals",style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color)),
         children: [
-          SizedBox(height: 8,),
+          const SizedBox(height: 8,),
           goal("Carbs goal (g) :", _carbsGoalController, setCarbsGoal),
-          SizedBox(height: 8,),
+          const SizedBox(height: 8,),
           goal("Protein goal (g) :", _proteinGoalController, setProteinGoal),
-          SizedBox(height: 8,),
+          const SizedBox(height: 8,),
           goal("Fat goal (g) :", _fatGoalController, setFatGoal),
-          SizedBox(height: 8,),
+          const SizedBox(height: 8,),
           goal("Salt goal (g) :", _saltGoalController, setSaltGoal)
         ],
       )
@@ -302,29 +309,29 @@ class _SettingsPageState extends State<SettingsPage>
         color: Theme.of(context).primaryColor,
       ),
       child: ExpansionTile(
-        childrenPadding: EdgeInsets.all(8),
+        childrenPadding: const EdgeInsets.all(8),
         title: Text("Customization",style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color)),
         children: [
           Row(
             children: [
-              Text("Use dark mode:"),
+              const Text("Use dark mode:"),
               IconButton(onPressed: toggleDarkMode, icon:
                 FutureBuilder(
                   future: DatabaseManager.isDarkMode(), 
                   builder: (context,snapshot){
                     if(snapshot.connectionState==ConnectionState.waiting){
-                      return Icon(Icons.refresh);
+                      return const Icon(Icons.refresh);
                     }
                     else if(snapshot.connectionState==ConnectionState.done){
                       if(snapshot.data==true){
-                        return Icon(Icons.toggle_on);
+                        return const Icon(Icons.toggle_on);
                       }
                       else{
-                        return Icon(Icons.toggle_off_outlined);
+                        return const Icon(Icons.toggle_off_outlined);
                       }
                     }
                     else{
-                      return Icon(Icons.error);
+                      return const Icon(Icons.error);
                     }
                     
                   }
@@ -353,9 +360,9 @@ class _SettingsPageState extends State<SettingsPage>
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(height: 40),
-          Text("Settings",style: TextStyle(fontSize: 40),),
-          SizedBox(height: 10),
+          const SizedBox(height: 40),
+          const Text("Settings",style: TextStyle(fontSize: 40),),
+          const SizedBox(height: 10),
           Expanded(child: 
             SingleChildScrollView(
               child: Column(

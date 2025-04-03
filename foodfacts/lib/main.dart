@@ -68,8 +68,10 @@ class _MyAppState extends State<MyApp>{
           bodyMedium: TextStyle(color: Colors.white,fontSize: 12),
         ),
         snackBarTheme: const SnackBarThemeData(
+          insetPadding: EdgeInsets.only(bottom: 50),
           backgroundColor: Color.fromARGB(255, 100, 80, 150),
-          elevation: 8
+          behavior: SnackBarBehavior.floating,
+
         ),
         splashColor: const Color.fromARGB(255, 100, 80, 150),
       );
@@ -85,8 +87,11 @@ class _MyAppState extends State<MyApp>{
           bodyMedium: TextStyle(color: Colors.black,fontSize: 12),
         ),
         snackBarTheme: const SnackBarThemeData(
+          behavior: SnackBarBehavior.floating,
+
+          insetPadding: EdgeInsets.only(bottom: 20),
           backgroundColor: Color.fromARGB(255, 235, 220, 255),
-          elevation: 8
+          
         ),
         splashColor: const Color.fromARGB(255, 190, 180, 230),
       );

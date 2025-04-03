@@ -23,7 +23,7 @@ class _BarcodeScannerState extends State<Barcodescanner>
   String _errorMessage = ":(";
   String _scannedBarcode = "";
   late Food _scannedFood;
-  TextEditingController _weightEntryController = TextEditingController();
+  final TextEditingController _weightEntryController = TextEditingController();
   
   Future<void> scanBarcode() async
   {

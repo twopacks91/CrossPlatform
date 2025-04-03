@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +19,7 @@ class _FavouritesPageState extends State<FavouritesPage>
 {
   bool _hasNoFavourites = true;
   List<Food> _foodList = [];
-  TextEditingController _weightEntryController = TextEditingController();
+  final TextEditingController _weightEntryController = TextEditingController();
   String query = 'jaffa cake';
   bool _showFoodInfo = false;
   int _foodInfoIndex = 0;
@@ -69,7 +69,9 @@ class _FavouritesPageState extends State<FavouritesPage>
     });
     Food food = _foodList[_foodInfoIndex];
     await FirebaseFirestore.instance.collection("favfoods").doc(food.barcode).delete();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food removed from favourites list",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2),));
+    if(mounted){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Food removed from favourites list",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));
+    }
   }
 
   void tappedFood(int index)
@@ -101,7 +103,7 @@ class _FavouritesPageState extends State<FavouritesPage>
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(8)),
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
                 color: Theme.of(context).primaryColor,
                 border: Border.all(color: Theme.of(context).highlightColor)
               ),
@@ -133,7 +135,7 @@ class _FavouritesPageState extends State<FavouritesPage>
     }
     catch(ex){
       im = Image(
-        image: AssetImage('assets/nointernet.png'),
+        image: const AssetImage('assets/nointernet.png'),
         height: height,
         fit: BoxFit.fill,
       );
@@ -147,7 +149,7 @@ class _FavouritesPageState extends State<FavouritesPage>
       backgroundColor: Theme.of(context).canvasColor,
       body: Column(
           children: [
-            Padding(
+            const Padding(
               padding: 
                 EdgeInsets.all(12),
               ),
@@ -156,11 +158,11 @@ class _FavouritesPageState extends State<FavouritesPage>
                 if(snapshot.connectionState == ConnectionState.done){
                   if(snapshot.data==true){
                     if(_hasNoFavourites){
-                      return Center(
+                      return const Center(
                         child:Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           mainAxisSize: MainAxisSize.max,
-                          children: const [
+                          children: [
                             Text("You have no favourited foods",textAlign: TextAlign.center),
                             Text("Try adding some from the search page",textAlign: TextAlign.center),
                           ],
@@ -250,11 +252,16 @@ class _FavouritesPageState extends State<FavouritesPage>
       setState(() {
       _showFoodInfo = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal added",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2),));
+      if(mounted){
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Meal added",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));
+      }
     }
     else
     {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Enter a meal weight before adding",style: Theme.of(context).textTheme.bodyMedium),duration: Duration(seconds: 2),));
+      if(mounted){
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Enter a meal weight before adding",style: Theme.of(context).textTheme.bodyMedium),duration: const Duration(seconds: 2),));      
+      }
+      
     }
   }
 
@@ -274,7 +281,7 @@ class _FavouritesPageState extends State<FavouritesPage>
         crossAxisSpacing: 8.0,
         mainAxisSpacing: 8.0,
       ), 
-      padding: EdgeInsets.all(8),
+      padding: const EdgeInsets.all(8),
       itemCount: 6,
       itemBuilder: (context,index) {
         return Shimmer.fromColors(
@@ -283,7 +290,7 @@ class _FavouritesPageState extends State<FavouritesPage>
           child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
                   color: Theme.of(context).primaryColor,
                   border: Border.all(color: Theme.of(context).highlightColor)
                 ),
@@ -298,11 +305,11 @@ class _FavouritesPageState extends State<FavouritesPage>
     return Scaffold(
       backgroundColor: Theme.of(context).canvasColor,
       body: Padding(
-        padding: EdgeInsets.all(12),
+        padding: const EdgeInsets.all(12),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            SizedBox(height: 20,),
+            const SizedBox(height: 20,),
             SizedBox(
               height: 200,
               child: internetImage(
@@ -310,7 +317,7 @@ class _FavouritesPageState extends State<FavouritesPage>
                 200,
               )
             ),
-            Expanded(child: SizedBox(),),
+            const Expanded(child: SizedBox(),),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -325,7 +332,7 @@ class _FavouritesPageState extends State<FavouritesPage>
                     child: Text('-',style: Theme.of(context).textTheme.bodyLarge,)
                   ),
                 ),
-                SizedBox(width: 8,),
+                const SizedBox(width: 8,),
                 Expanded(
                   child: TextField(
                     keyboardType: TextInputType.number,
@@ -335,13 +342,13 @@ class _FavouritesPageState extends State<FavouritesPage>
                       hintStyle: Theme.of(context).textTheme.bodyLarge,
                       filled:true,
                       fillColor: Theme.of(context).primaryColor,
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                     ),
                   controller: _weightEntryController,
                   textAlign: TextAlign.center,
                   ),
                 ),
-                SizedBox(width: 8,),
+                const SizedBox(width: 8,),
                 SizedBox(
                   width: 50,
                   height: 50,
@@ -355,9 +362,9 @@ class _FavouritesPageState extends State<FavouritesPage>
                 ),
               ],
             ),
-            Expanded(child: SizedBox(),),
+            const Expanded(child: SizedBox(),),
             Container(
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               width: 420,
               height: 300,
               decoration: BoxDecoration(
@@ -368,15 +375,15 @@ class _FavouritesPageState extends State<FavouritesPage>
               child: Column(
                 children: [
                   
-                  Text("Calories: ${_foodList[_foodInfoIndex].calories}kcal",style: TextStyle(fontSize: 20)),
-                  Text("Carbs   : ${_foodList[_foodInfoIndex].carbs}g",style: TextStyle(fontSize: 20)),
-                  Text("Protein : ${_foodList[_foodInfoIndex].protein}g",style: TextStyle(fontSize: 20)),
-                  Text("Salt    : ${_foodList[_foodInfoIndex].salt}g",style: TextStyle(fontSize: 20)),
-                  Text("Fat     : ${_foodList[_foodInfoIndex].fat}g",style: TextStyle(fontSize: 20)),
+                  Text("Calories: ${_foodList[_foodInfoIndex].calories.round()}kcal",style: const TextStyle(fontSize: 20)),
+                  Text("Carbs   : ${_foodList[_foodInfoIndex].carbs.round()}g",style: const TextStyle(fontSize: 20)),
+                  Text("Protein : ${_foodList[_foodInfoIndex].protein.round()}g",style: const TextStyle(fontSize: 20)),
+                  Text("Salt    : ${_foodList[_foodInfoIndex].salt.round()}g",style: const TextStyle(fontSize: 20)),
+                  Text("Fat     : ${_foodList[_foodInfoIndex].fat.round()}g",style: const TextStyle(fontSize: 20)),
                 ],
               ),
             ),
-            Expanded(child: SizedBox(),),
+            const Expanded(child: SizedBox(),),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -416,7 +423,7 @@ class _FavouritesPageState extends State<FavouritesPage>
                 )
               ],
             ),
-            SizedBox(height: 20,)
+            const SizedBox(height: 20,)
           ],
         ),
       )
@@ -439,7 +446,7 @@ class _FavouritesPageState extends State<FavouritesPage>
   {
     return Center(
       child: Container(
-        padding: EdgeInsets.all(12),
+        padding: const EdgeInsets.all(12),
         width: 200,
         height: 200,
         decoration: BoxDecoration(
@@ -447,10 +454,10 @@ class _FavouritesPageState extends State<FavouritesPage>
           border: Border.all(color: Theme.of(context).highlightColor),
           color: Theme.of(context).primaryColor,
         ),
-        child: Center(
+        child: const Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: const [
+            children: [
               Text("You need to be connected to the internet to use the favourites feature"),
             ],
           ),
